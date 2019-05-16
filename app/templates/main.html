@@ -1,0 +1,91 @@
+{%extends "base.html"%}
+{%import 'bootstrap/wtf.html' as wtf%}
+
+{%block app_content%}
+  <head>
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>Carousel Template for Bootstrap</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="../../assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
+
+    <!-- Custom styles for this template -->
+    <link href="carousel.css" rel="stylesheet">
+  </head>
+<!-- NAVBAR
+================================================== -->
+  <body>
+
+    <!-- Title
+    ================================================== -->
+    <div>
+      <h1>Welcome to Pinla!</h1>
+        <p>This is a portfolio to present some of my projects.</p>
+        <p>Below you will find a quick description of them along with a link for you to learn more.</p>
+
+    </div>
+
+    <hr>
+
+
+    <!-- Marketing messaging and featurettes
+    ================================================== -->
+    <!-- Wrap the rest of the page in another container to center all the content. -->
+
+    <div class="container marketing">
+
+      <!-- Three columns of text below the carousel -->
+      <div class="row">
+        <div class="col-lg-6">
+          <img class="" src="{{url_for('static', filename='images/jinni_cropped.png')}}" alt="Jinni Logo" style="width:120px;height:140px;">
+          <h2>Jinni</h2>
+          <p>Jinni is an lyric generator to help you compose a completely new song.</p>
+          <p><a class="btn btn-default" href="{{url_for('main.jinni_main')}}" role="button">Learn More &raquo;</a></p>
+        </div><!-- /.col-lg-4 -->
+        <div class="col-lg-6">
+          <img class="" src="{{url_for('static', filename='images/rn_logo.png')}}" alt="Generic placeholder image" width="140" height="140">
+          <h2>Random RNs</h2>
+          <p>Random RNs is a program to help you analyze reaction networks, a growing field of study in mathematics.</p>
+          <p><a class="btn btn-default" href="{{url_for('main.rn_main')}}" role="button">Learn More &raquo;</a></p>
+        </div><!-- /.col-lg-4 -->
+
+      </div><!-- /.row -->
+
+    </div><!-- /.container -->
+
+  </body>
+
+{%endblock%}
+
+{%block scripts%}
+    {{super()}}
+    {{moment.include_moment()}}
+    {{moment.lang(g.locale)}}
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+    <script src="../../dist/js/bootstrap.min.js"></script>
+    <!-- Just to make our placeholder images work. Don't actually copy the next line! -->
+    <script src="../../assets/js/vendor/holder.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
+
+{%endblock%}

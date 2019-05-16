@@ -1,0 +1,24 @@
+{%extends "base.html"%}
+{%import 'bootstrap/wtf.html' as wtf%}
+
+{%block app_content%}
+    <h1>Jinni - Lyric Generator</h1>
+    <h3>{{_('Calculate the rhyme distance between two words. The distance is measured in range [0,1].')}}</h3>
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4">
+           {{wtf.quick_form(form)}}
+        </div>
+    </div>
+
+    {%if output == -3%}
+    <h3>{{_('Neither of these words is in database.')}}</h3>
+    {%elif output == -2%}
+    <h3>{{_('%(word_2)s is not in database', word_2=word_2)}}</h3>
+    {%elif output == -1%}
+    <h3>{{_('%(word_1)s is not in database', word_1=word_1)}}</h3>
+    {%elif output != -4%}
+    <h3>{{_('Distance between %(word_1)s and %(word_2)s = %(output)s', word_1=word_1, word_2=word_2, output=output)}}</h3>
+    {%endif%}
+
+
+{%endblock%}

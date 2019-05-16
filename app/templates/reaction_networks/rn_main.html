@@ -1,0 +1,40 @@
+{%extends "base.html"%}
+{%import 'bootstrap/wtf.html' as wtf%}
+
+{%block app_content%}
+    <head>
+        <h1>Reaction Network</h1>
+        <link rel="stylesheet" href="#">
+    </head>
+    <h3>Probability of Deficiency 0 Reaction Network Occuring</h3>
+    <br>
+    <div class="container">
+
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3">
+                <h4>-Describe algorithm here-</h4>
+            </div>
+        </div>
+
+        <br>
+
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3">
+                <h4>Plot of Probability of Deficiency 0 vs pn</h4>
+                <form action="" method="post">
+                    {{ rn_form.hidden_tag() }}
+                    {{rn_form.n.label}}
+                    {{rn_form.n(size=4)}}
+                    <br>
+                    {% for error in rn_form.n.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                    <br>
+                    {{rn_form.submit()}}
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+{%endblock%}

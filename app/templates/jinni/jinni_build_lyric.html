@@ -1,0 +1,14 @@
+{%extends "base.html"%}
+{%import 'bootstrap/wtf.html' as wtf%}
+
+{%block app_content%}
+    <h1>Jinni</h1>
+    <h3>Lyric Generator</h3>
+    <br>
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4">
+           {{wtf.quick_form(form)}}
+        </div>
+    </div>
+
+{%endblock%}

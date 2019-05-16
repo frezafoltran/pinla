@@ -1,0 +1,37 @@
+.bad_button {
+  background-color: rgb(255, 59, 10);
+  border: none;
+  color: rgb(190,190,190);
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+
+.good_button {
+  background-color: rgb(87, 133, 10);
+  border: none;
+  color: rgb(190,190,190);
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+
+.edit_button {
+  color: rgb(120,120,120);
+  background-color: rgb(255,240,255);
+  border: none;
+  padding: 5px 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+
+.song_display{
+   background-color: rgb(255,240,255);
+}
+

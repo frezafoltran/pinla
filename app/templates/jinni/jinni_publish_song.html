@@ -1,0 +1,18 @@
+{%extends "base.html"%}
+{%import 'bootstrap/wtf.html' as wtf%}
+
+{%block app_content%}
+    <head>
+        <h1><img src="{{ url_for('static', filename='images/jinni_full.png') }}"
+                       alt="Jinni logo" style="width:140px;height:105px;"></h1>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/jinni_main.css') }}">
+    </head>
+    <h3>Lyric Generator</h3>
+    <br>
+    <div class="container">
+
+        <h3>Your song is now published.</h3>
+    </div>
+
+
+{%endblock%}

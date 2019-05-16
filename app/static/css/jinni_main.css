@@ -1,0 +1,16 @@
+.option_button{
+  background-color: rgb(32,220,200);
+  border: none;
+  color: rgb(0,0,0);
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+
+
+hr{
+ background-color:black;
+ height: 1px; border: 0;
+}

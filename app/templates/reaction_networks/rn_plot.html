@@ -1,0 +1,28 @@
+{%extends "base.html"%}
+{%import 'bootstrap/wtf.html' as wtf%}
+
+{%block app_content%}
+    <head>
+        <h1></h1>
+        <link rel="stylesheet" href="#">
+    </head>
+    <h3>--</h3>
+    <br>
+    <div class="container">
+
+        <div class="row">
+
+            <img src="{{url_for('static', filename=zoomed)}}"
+                       alt="" style="width:600px;height:500px;">
+        </div>
+        <br>
+        <div class="row">
+            <img src="{{url_for('static', filename=full)}}"
+                       alt="" style="width:600px;height:500px;">
+
+        </div>
+
+
+    </div>
+
+{%endblock%}

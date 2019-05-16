@@ -1,0 +1,150 @@
+{%extends "base.html"%}
+{%import 'bootstrap/wtf.html' as wtf%}
+
+{%block app_content%}
+    <head>
+        <h1><img src="{{ url_for('static', filename='images/jinni_full.png') }}"
+                       alt="Jinni logo" style="width:140px;height:105px;"></h1>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/jinni_new_song.css') }}">
+    </head>
+    <h4>You can hover over any sentence to get replacement suggestions.
+        <br> Or you can click on the edit button to manually edit it.</h4>
+    <h4><a href="{{ url_for('main.jinni_main') }}">Start Over</a></h4>
+
+    <div class="row">
+        <div class="col-lg-6 col-md-offset-3 song_display" style="padding-bottom: 14px;">
+            <h3 id="test" style="color:rgb(200,180,225)">The {{about}} song</h3>
+
+            {%if lyric%}
+            {%for line in lyric%}
+
+            <h4 class="song_line">
+
+                    <span style="display:none" >{{loop.index}} -~
+                    </span>
+                    <a href="{{url_for('main.jinni_implement_recom_custom', recom='-none-', song_id=song_id, line_id=loop.index-1)}}">
+                        <img src="{{ url_for('static', filename='images/refresh.png') }}" style="width:12px;height:12px;"> </a>
+
+                    <span id="{{loop.index0}}" contenteditable="false" >{{line}}</span><span style="display:none">~</span>
+                    <button class="edit_button" onclick="editLine(this);">Edit</button>
+            </h4>
+
+            {%endfor%}
+
+            {%if end == 0%}
+            <h4>
+            <a href="{{ url_for('main.jinni_new_song_custom', liked=1, song_id=song_id) }}">
+                <img src="{{url_for('static', filename='images/add.jpg')}}" style="width:40px;height:40px;"></a>
+            </h4>
+            {%endif%}
+            <h4>
+            <a href="{{url_for('main.jinni_publish_song', song_id=song_id)}}" style="color:rgb(200,180,225)">Publish your Song</a>
+                <h4/>
+            {%endif%}
+
+            {%if end == 1%}
+            <div>
+                <h4 style="color:rgb(200,180,225)">Your cannot have more lines in this song.</h4>
+                <h4 style="color:rgb(200,180,225)">Click <a href="{{url_for('main.jinni_main')}}">here</a>
+                to start a new song.</h4>
+            </div>
+            {%endif%}
+        </div>
+    </div>
+
+{%endblock%}
+
+{%block scripts%}
+    {{super()}}
+    {{moment.include_moment()}}
+    {{moment.lang(g.locale)}}
+    <script>
+
+        $(function () {
+            var timer = null;
+            var timer_2 = null;
+            var xhr = null;
+            var curr_text = null;
+            var temp = null;
+            var line_id = null;
+            var append = null;
+
+
+            $('.song_line').hover(
+                function(event) {
+                    // mouse in event handler
+                    if (timer_2){
+                        clearTimeout(timer_2);
+                        timer_2 = null;
+                    }
+
+                    else {
+                        var elem = $(event.currentTarget);
+                        timer = setTimeout(function() {
+                            timer = null;
+                            curr_text = elem.text().trim();
+                            temp = curr_text.indexOf('-');
+                            line_id = curr_text.substring(0, temp)-1;
+                            append = {{song_id|safe}} + '/' + line_id;
+
+                            xhr = $.ajax(
+                                '/jinni_line_edit_custom/' + append).done(
+                                    function(data) {
+                                        xhr = null;
+                                        elem.popover({
+                                            trigger: 'manual',
+                                            html: true,
+                                            animation: false,
+                                            container: elem,
+                                            content: data,
+                                            placement: "top"
+                                        }).popover('show');
+                                    }
+                                );
+                        }, 50);
+                    }
+                },
+                function(event) {
+                    // mouse out event handler
+                    var elem = $(event.currentTarget);
+                    if (timer) {
+                        clearTimeout(timer);
+                        timer = null;
+                    }
+                    else if (xhr) {
+                        xhr.abort();
+                        xhr = null;
+                    }
+                    else {
+                        elem.popover('destroy');
+                    }
+                }
+            );
+        });
+
+        function editLine(button) {
+
+            line_id = $(button).parent().text();
+            line_id = line_id.substring(0,line_id.indexOf('-')) - 1;
+
+            var x = document.getElementById(line_id);
+
+            if (x.contentEditable == "false") {
+                x.contentEditable = "true";
+                button.innerHTML = "Commit!";
+            } else {
+
+                //get rid of new line characters
+                new_line = $(button).parent().text();
+                new_line = new_line.substring(new_line.indexOf('~')+1,new_line.lastIndexOf('~') );
+                new_line = new_line.trim();
+
+                $.ajax('/jinni_implement_recom_custom/' + new_line + '/'+ {{song_id|safe}} +'/' + line_id)
+
+                x.contentEditable = "false";
+                button.innerHTML = "Edit";
+            }
+        }
+
+    </script>
+{%endblock%}

@@ -1,0 +1,14 @@
+<table class="table">
+    <tr>
+
+        <td style="border: 0px;">
+
+            <small>
+                <p>Possible Replacements:</p>
+                {%for sentence in suggestions%}
+                <a href="{{url_for('main.jinni_implement_recom_custom', recom=sentence[0] + '!-!' + sentence[1], song_id=song_id, line_id=line_id)}}"><p>- {{sentence[0]}}</p></a>
+                {%endfor%}
+            </small>
+        </td>
+    </tr>
+</table>

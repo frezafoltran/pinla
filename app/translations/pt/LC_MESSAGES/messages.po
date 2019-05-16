@@ -1,0 +1,313 @@
+# Portuguese translations for PROJECT.
+# Copyright (C) 2019 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2019.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2019-04-17 10:23-0500\n"
+"PO-Revision-Date: 2019-04-17 10:23-0500\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: pt\n"
+"Language-Team: pt <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+
+#: app/__init__.py:23
+msgid "Please login to access this page."
+msgstr "Por favor, faca o login para visitar essa pagina."
+
+#: app/translate.py:9
+msgid "Error: The translation service is not configured."
+msgstr ""
+
+#: app/translate.py:17
+msgid "Error: the translation service failed."
+msgstr ""
+
+#: app/auth/email.py:7
+msgid "[Lapin] Reset Your Password"
+msgstr "[Pinla] Redefina sua Senha"
+
+#: app/auth/forms.py:8 app/auth/forms.py:14 app/main/forms.py:9
+msgid "Username"
+msgstr ""
+
+#: app/auth/forms.py:9 app/auth/forms.py:16 app/auth/forms.py:37
+msgid "Password"
+msgstr ""
+
+#: app/auth/forms.py:10
+msgid "Remember Me"
+msgstr ""
+
+#: app/auth/forms.py:11 app/auth/routes.py:27 app/templates/auth/login.html:6
+msgid "Sign In"
+msgstr "Entrar"
+
+#: app/auth/forms.py:15 app/auth/forms.py:33
+msgid "Email"
+msgstr ""
+
+#: app/auth/forms.py:17 app/auth/forms.py:38
+msgid "Repeat Password"
+msgstr ""
+
+#: app/auth/forms.py:18 app/auth/routes.py:49 app/templates/auth/sign_up.html:6
+msgid "Sign Up"
+msgstr ""
+
+#: app/auth/forms.py:24
+msgid "This username is already used. Please use a different username"
+msgstr ""
+
+#: app/auth/forms.py:30
+msgid ""
+"An account with this email already exists. Please use a different email "
+"or check ?"
+msgstr ""
+
+#: app/auth/forms.py:34 app/auth/forms.py:39 app/auth/routes.py:66
+#: app/templates/auth/reset_password_request.html:6
+msgid "Reset Password"
+msgstr ""
+
+#: app/auth/routes.py:20
+msgid "Invalid username or password"
+msgstr ""
+
+#: app/auth/routes.py:46
+msgid "Nice, you successfully signed up!"
+msgstr ""
+
+#: app/auth/routes.py:64
+msgid "Please check you email for further instructions to reset your password."
+msgstr ""
+
+#: app/auth/routes.py:79
+msgid "Your password has been reset."
+msgstr ""
+
+#: app/main/forms.py:10
+msgid "About me"
+msgstr ""
+
+#: app/main/forms.py:11 app/main/forms.py:26
+msgid "Submit"
+msgstr ""
+
+#: app/main/forms.py:22
+msgid "This username is already being used. Please use a different one."
+msgstr ""
+
+#: app/main/forms.py:25
+msgid "Share an Idea"
+msgstr ""
+
+#: app/main/forms.py:32
+msgid "First word"
+msgstr ""
+
+#: app/main/forms.py:33
+msgid "Second word"
+msgstr ""
+
+#: app/main/forms.py:35
+msgid "Get distance!"
+msgstr ""
+
+#: app/main/forms.py:38
+msgid "Build song lyric about"
+msgstr ""
+
+#: app/main/forms.py:39
+msgid "Get lyrics!"
+msgstr ""
+
+#: app/main/forms.py:42 app/main/routes.py:192
+msgid "Search"
+msgstr ""
+
+#: app/main/routes.py:36
+msgid "Your idea is posted!"
+msgstr ""
+
+#: app/main/routes.py:52
+msgid "Home Page"
+msgstr ""
+
+#: app/main/routes.py:83
+msgid "Your profile changes have been saved."
+msgstr ""
+
+#: app/main/routes.py:96
+msgid "User %(username) not found"
+msgstr ""
+
+#: app/main/routes.py:100
+msgid "You cannot follow yourself!"
+msgstr ""
+
+#: app/main/routes.py:105
+msgid "You are now following %(username)"
+msgstr ""
+
+#: app/main/routes.py:113
+msgid "User %(username) not found."
+msgstr ""
+
+#: app/main/routes.py:116
+msgid "You cannot unfollow yourself!"
+msgstr ""
+
+#: app/main/routes.py:120
+msgid "You are not following %(username)."
+msgstr ""
+
+#: app/main/routes.py:138 app/templates/base.html:22
+msgid "Explore"
+msgstr ""
+
+#: app/main/routes.py:160
+msgid "This functionality will be soon implemented!"
+msgstr ""
+
+#: app/templates/_post.html:23
+msgid "Translate"
+msgstr ""
+
+#: app/templates/base.html:4
+msgid "Welcome to Pinla"
+msgstr ""
+
+#: app/templates/base.html:17
+msgid "Pinla"
+msgstr ""
+
+#: app/templates/base.html:21
+msgid "Home"
+msgstr ""
+
+#: app/templates/base.html:28
+msgid "Build Lyrics"
+msgstr ""
+
+#: app/templates/base.html:29
+msgid "Rhyme Distance"
+msgstr ""
+
+#: app/templates/base.html:43
+msgid "Login"
+msgstr ""
+
+#: app/templates/base.html:45
+msgid "Profile"
+msgstr ""
+
+#: app/templates/base.html:46
+msgid "Logout"
+msgstr ""
+
+#: app/templates/base.html:85
+msgid "Error: Could not contact server."
+msgstr ""
+
+#: app/templates/edit_profile.html:5
+msgid "Edit Profile"
+msgstr ""
+
+#: app/templates/ghost_rhyme_distance.html:6
+msgid ""
+"Calculate the rhyme distance between two words. The distance is measured "
+"in range [0,1]."
+msgstr ""
+
+#: app/templates/ghost_rhyme_distance.html:14
+msgid "Neither of these words is in database."
+msgstr ""
+
+#: app/templates/ghost_rhyme_distance.html:16
+#, python-format
+msgid "%(word_2)s is not in database"
+msgstr ""
+
+#: app/templates/ghost_rhyme_distance.html:18
+#, python-format
+msgid "%(word_1)s is not in database"
+msgstr ""
+
+#: app/templates/ghost_rhyme_distance.html:20
+#, python-format
+msgid "Distance between %(word_1)s and %(word_2)s = %(output)s"
+msgstr ""
+
+#: app/templates/index.html:6
+#, python-format
+msgid "Hi, %(username)s!"
+msgstr ""
+
+#: app/templates/index.html:24 app/templates/user.html:39
+msgid "Newer posts"
+msgstr ""
+
+#: app/templates/index.html:29 app/templates/user.html:44
+msgid "Older posts"
+msgstr ""
+
+#: app/templates/search.html:4
+msgid "Search Results"
+msgstr ""
+
+#: app/templates/search.html:13
+msgid "Previous results"
+msgstr ""
+
+#: app/templates/search.html:18
+msgid "Next results"
+msgstr ""
+
+#: app/templates/user.html:14
+msgid "Last seen on"
+msgstr ""
+
+#: app/templates/auth/login.html:14
+msgid "New User?"
+msgstr ""
+
+#: app/templates/auth/login.html:14
+msgid "Click Here to Sign Up!"
+msgstr ""
+
+#: app/templates/auth/login.html:16
+msgid "Forgot Your Password?"
+msgstr ""
+
+#: app/templates/auth/login.html:17
+msgid "Click Here to Reset It"
+msgstr ""
+
+#: app/templates/auth/reset_password.html:5
+msgid "Reset your Password"
+msgstr ""
+
+#: app/templates/errors/404.html:4
+msgid "Page Not Found"
+msgstr ""
+
+#: app/templates/errors/404.html:5 app/templates/errors/500.html:6
+msgid "Go Back to  Home Page"
+msgstr ""
+
+#: app/templates/errors/500.html:4
+msgid "An Unexpected error has occurred"
+msgstr ""
+
+#: app/templates/errors/500.html:5
+msgid "We are working to fix this error. Sorry for the inconvenience!"
+msgstr ""
+
