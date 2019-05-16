@@ -179,7 +179,8 @@ class Songs(db.Model):
     def song_about(self):
         """Returns what current song is about"""
         ind = self.about.find(';')
-        return self.about[:ind]
+        ind_2 = self.about.rfind('=')
+        return self.about[ind_2+1:ind]
 
     def update_related(self, new_related, last_words, rhyming_sent, thread = False):
         """Given a list of new sentences, this function adds them to related and rhyme_related columns

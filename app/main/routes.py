@@ -234,7 +234,7 @@ def jinni_new_song_custom(song_id, liked):
             return render_template('jinni/jinni_new_song_custom.html', lyric=lyric_clean, song_id=song_id, ids=ids, end=0, about=about)
 
     song = Songs.query.filter_by(id=song_id).first()
-    about = song.about.split(';')[0]
+    about = song.song_about()
     lyric_clean = song.part_1.split(';')[1:]
 
     first_sentence = song.part_1.split(';')[1:]
@@ -264,7 +264,7 @@ def jinni_new_song_custom(song_id, liked):
         if curr_line % 2 == 0:
 
             # indicates self.related is currently being used
-            if song.related[0] == '=':
+            if song.about[0] == '=':
                 thread_bool = False
             # if song.related_thr is currently used
             else:
@@ -473,6 +473,26 @@ def jinni_implement_recom_custom(recom, song_id, line_id):
 
     return redirect(url_for('main.jinni_new_song_custom', song_id=song_id, liked=3))
 
+@bp.route('/jinni_use_syn/<song_id>/<syn>')
+def jinni_use_syn(song_id, syn):
+
+    song = Songs.query.filter_by(id=song_id).first()
+    song.clear_lyrics()
+    req_word = syn
+
+    # format string of similar words
+    syns = list_of_similar_words_updated(req_word)
+    song.about = '==' + req_word + ';' + str(syns[0]) + ';' + str(syns[1])
+    db.session.commit()
+
+    # populate the field related_thr and rhyme_related_thr by using thread
+    populate_custom_song(syns, song.id)
+
+    populate_custom_song(syns, song.id, thread=False, first=True)
+
+    return render_template('jinni/jinni_main_waiting.html', song=song)
+
+
 @bp.route('/jinni_implement_recom/<recom>/<song_id>/<line_id>', methods=['GET', 'POST'])
 def jinni_implement_recom(recom, song_id, line_id):
 
@@ -555,7 +575,6 @@ def jinni_main():
     db.session.add(song)
     song.clear_lyrics()
     first_sentence = generate_sentence()
-    #song.update_ids(str(first_sentence[1]))
     song.update_lyric(first_sentence)
     db.session.commit()
 
@@ -566,50 +585,16 @@ def jinni_main():
 
         #format string of similar words
         syns = list_of_similar_words_updated(req_word)
-        song.about = req_word + ';' + str(syns[0]) + ';' + str(syns[1])
+        song.about = '==' + req_word + ';' + str(syns[0]) + ';' + str(syns[1])
         db.session.commit()
-
-        # populate local database with sentences that are similar to requested word
-        related = sentence_related(syns)
 
         # populate the field related_thr and rhyme_related_thr by using thread
         populate_custom_song(syns, song.id)
 
-        db.session.commit()
+        populate_custom_song(syns, song.id, thread=False, first=True)
 
-        # gets last words from sentences in new_related
-        last_words = []
-        for item in related:
-            temp = item[0].strip(' ').split(' ')[-1]
-            last_words.append(temp)
-
-        # sent has as keys last words from new_related. The values are sentences that are related to self.song_about()
-        # and rhyme with the key
-        sent = {}
-        for word in last_words:
-            sent[word] = []
-
-        for i in range(2):
-            temp = sentence_related(list_of_similar_words_updated(song.song_about()), rhyme=last_words, num_words=10, t_lim=5)
-            for s in temp:
-                sent[s[2]].append([s[0], s[1]])
-
-        song.update_related(related, last_words, sent)
-        db.session.commit()
-
-        song.update_related_id(id=0, action='used', line_being_used=1)
-        print('song.related: ', song.related)
-        print('song.related_ids: ', song.related_ids)
-        print('song.rhyme_related: ', song.rhyme_related)
-        print('song.rhyme_related_ids: ', song.rhyme_related_ids)
-
-
-        lyric = [related[0][0], int(related[0][1])]
-        song.update_lyric(lyric)
-        db.session.commit()
-
-
-        return redirect(url_for('main.jinni_new_song_custom', liked=2, song_id=song.id))
+        return render_template('jinni/jinni_main_waiting.html', song=song)
+        #return redirect(url_for('main.jinni_new_song_custom', liked=2, song_id=song.id))
 
     return render_template('jinni/jinni_main.html', curr_song=song, custom_song_form=custom_song_form, synonyms=synonyms)
 

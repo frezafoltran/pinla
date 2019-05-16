@@ -1,0 +1,106 @@
+{%extends "base.html"%}
+{%import 'bootstrap/wtf.html' as wtf%}
+
+{%block app_content%}
+    <head>
+        <h1><img class="not-loading" src="{{ url_for('static', filename='images/jinni_full.png') }}"
+                       alt="Jinni logo" style="width:266px;height:200px; display:none;"></h1>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/jinni_main.css') }}">
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    </head>
+    <div style="">
+        <img class="loading" src="{{ url_for('static', filename='images/load.gif') }}"
+                                                    style="width:200px;height:200px;" alt="" />
+        <h2 class="loading">Jinni is now rubbing his magic lamp to produce some great lyrics to you!</h2>
+        <h2 id="timer_div"></h2>
+        <h2 id="go_build_lyric" style="display:none;"><a href="{{ url_for('main.jinni_new_song_custom', liked=2, song_id=song.id) }}">
+            Click Here To Start!</a></h2>
+        <h2 id="curious" style="color:rgb(255,255,140);">In the meantime, curious as to how Jinni works?</h2>
+
+          <div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="4000">
+            <!-- Indicators -->
+            <ol class="carousel-indicators">
+              <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+              <li data-target="#myCarousel" data-slide-to="1"></li>
+              <li data-target="#myCarousel" data-slide-to="2"></li>
+            </ol>
+
+            <!-- Wrapper for slides -->
+            <div class="carousel-inner">
+              <div class="item active">
+                <h3>There are two main aspects of songwriting Jinni implements<br><br><br><br><br><br><br></h3>
+              </div>
+
+              <div class="item">
+                  <h3>Sonority: We implemented an algorithm to measure how well two <br>
+                      sentences rhyme based on a modified version of minimum edit <br>
+                      distance, the phonetic representation of words and Metaphone 3 encoding.<br><br><br><br><br></h3>
+              </div>
+
+              <div class="item">
+                  <h3>Meaning: Our sentences are implemented by using Markov chains <br>
+                      in a similar way that word prediction algorithms work. We ensure <br>
+                      that sentences within a song match in meaning by using Word2Vec,<br>
+                      which is a machine learning Natural Language Processing algorithm.<br><br><br><br></h3>
+              </div>
+            </div>
+
+            <!-- Left and right controls -->
+            <a class="left carousel-control" href="#myCarousel" data-slide="prev">
+              <span class="glyphicon glyphicon-chevron-left"></span>
+              <span class="sr-only">Previous</span>
+            </a>
+            <a class="right carousel-control" href="#myCarousel" data-slide="next">
+              <span class="glyphicon glyphicon-chevron-right"></span>
+              <span class="sr-only">Next</span>
+            </a>
+          </div>
+
+
+        </div>
+
+
+{%endblock%}
+
+{%block scripts%}
+    {{super()}}
+    {{moment.include_moment()}}
+    {{moment.lang(g.locale)}}
+
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+
+<script>
+
+var seconds_left = 30;
+
+var interval = setInterval(function() {
+    document.getElementById('timer_div').innerHTML = "This should not take longer than " + --seconds_left + " seconds.";
+
+    if ('{{song.about[1]|safe}}' != '=' || seconds_left <= 0)
+    {
+       document.getElementById('timer_div').innerHTML = "Jinni is now ready!";
+       document.getElementById('curious').innerHTML = "Curious as to how Jinni works?";
+       clearInterval(interval);
+       document.getElementById('go_build_lyric').style.display="block";
+       document.getElementsByClassName('loading')[0].style.display="none";
+       document.getElementsByClassName('loading')[1].style.display="none";
+       document.getElementsByClassName('not-loading')[0].style.display="inline";
+
+    }
+}, 1000);
+
+
+
+</script>
+
+{%endblock%}
+
+
+

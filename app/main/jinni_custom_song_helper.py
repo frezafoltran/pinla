@@ -29,11 +29,12 @@ def get_related(non_used, song_id, curr_line, thread):
 
         # change current database we use
         if not thread:
-            song.related = song.related[1:]
-            song.related_thr = '=' + song.related_thr
+            song.about = song.about[1:]
+            #song.about_thr = '=' + song.about_thr
         else:
-            song.related_thr = song.related_thr[1:]
-            song.related = '=' + song.related
+            #song.about_thr = song.about_thr[1:]
+            song.about = '=' + song.about
+
         db.session.commit()
 
 

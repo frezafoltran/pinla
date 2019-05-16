@@ -41,13 +41,16 @@ class JinniRhymeDistanceForm(FlaskForm):
 
 class JinniCustomSong(FlaskForm):
 
-    req_word = StringField(_l('Enter a topic of your choice'), validators=[DataRequired()])
+    req_word = StringField(_l('Enter a topic of your choice'))
     submit = SubmitField(_l('Create a Song!'))
 
     # TODO validator not working!
     def validate_req_word(self, req_word):
 
         req_word = str(req_word.data).lower()
+        if not req_word:
+            raise ValidationError('Please type a word.')
+
         try:
             response = rhyme_table.get_item(
                 Key={

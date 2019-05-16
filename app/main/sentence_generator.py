@@ -10,6 +10,7 @@ import ast
 from threading import Thread
 from app.models import Songs
 from app import db
+from flask import redirect, url_for
 
 dynamodb = boto3.resource("dynamodb")
 lyric_table = dynamodb.Table("Lyric")
@@ -189,107 +190,6 @@ def sent_has_word(id, word):
     except KeyError:
         return 0
 
-"""
-def sentence_with_mod(words, rhyme=[]):
-    #Generates a sentence that contains one of the input words.
-    #mod takes a list of rhymes instead. Assume all entries in rhyme = [] are single words
-
-    t1 = time.time()
-    items = []
-
-    if rhyme == []:
-        while items == []:
-
-            r1 = random.randint(1, lyric_table.item_count - 1)
-
-            response = lyric_table.scan(
-                FilterExpression=Key(words[0]).eq(1)|Key(words[1]).eq(1)|Key(words[2]).eq(1)|Key(words[3]).eq(1)|Key(words[4]).eq(1),
-                ExclusiveStartKey={'id': r1},
-                )
-            items = response['Items']
-    else:
-
-        # each entry of ids corresponds to the ranges for a given word in rhyme list input
-        # ids = [[[r1, r2], [r3, r4]...], [[r5, r6],...], ...]
-        ids = []
-        for item in rhyme:
-            temp = list_of_rhymes(item)
-            #print(temp)
-            ids.append(list(filter(None, list(temp.values()))))
-
-        for j in range(len(ids)):
-            for i in range(len(ids[j])):
-                if ids[j][i][0] > ids[j][i][1]:
-                    temp = ids[j][i][0]
-                    ids[j][i][0] = ids[j][i][1]
-                    ids[j][i][1] = temp
-
-
-        #TODO Understand the bound in range(min(len(rhyme), 7))
-        filt = Key('id').between(0, 0)
-        for j in range(3):
-            for i in range(len(ids[j])):
-                filt |= Key('id').between(int(ids[j][i][0]), int(ids[j][i][1]))
-
-        # for now assume rhyme has length 3 at least.
-        items = []
-        while items == []:
-            print('loop:', time.time() - t1)
-
-            #r1 = random.randint(1, lyric_table.item_count - 1)
-            r1 = random.randint(0,len(rhyme)-1)
-            try:
-                r2 = random.randint(0,len(ids[r1])-1)
-                r3 = random.randint(ids[r1][r2][0], ids[r1][r2][1])
-            except ValueError:
-                r3 = random.randint(1, lyric_table.item_count - 1)
-
-            try:
-
-                response = lyric_table.scan(
-                    FilterExpression=(Key(words[0]).eq(1) | Key(words[1]).eq(1) | Key(words[2]).eq(1) | Key(words[3]).eq(1)| Key(words[4]).eq(1)) & filt,
-
-                    ExclusiveStartKey={'id': r3},
-                )
-
-                items = response['Items']
-
-            except (exceptions.ClientError):
-                print('exception')
-                continue
-
-    sentences = []
-    for item in items:
-        sent = ''
-
-        # get which word sent rhymes with
-        if rhyme != []:
-            id = item['id']
-            found = -1
-            for j in range(len(ids)):
-                for i in range(len(ids[j])):
-                    if id <= ids[j][i][1] and id >= ids[j][i][0]:
-                        found = j
-                        break
-                if found == j:
-                    break
-        try:
-            for word in item['sent']:
-                sent += word + ' '
-            if rhyme != []:
-                sentences.append([sent, item['id'], rhyme[found]])
-            else:
-                sentences.append([sent, item['id']])
-
-        except TypeError:
-            continue
-
-    if len(sentences) > 10:
-        return sentences[:10]
-    else:
-        return sentences
-        
-        """
 
 def get_good_sent_batch_helper(temp, rhyme, rand_i, syns):
 
@@ -404,7 +304,6 @@ def sentence_with(words, rhyme=[], t_lim=7):
             temp = list_of_rhymes(item)
             ids.append(list(filter(None, list(temp.values()))))
 
-        print('ids: ', ids)
         rand = random.sample(range(len(ids)), len(ids))
         good_sent = []
 
@@ -648,7 +547,7 @@ def update_rhyme_ids(word):
     update_table(rhyme_table, word, 'rhymes', new_rhyme_list)
 
 
-def populate_custom_song_async(syns, song_id, thread=True):
+def populate_custom_song_async(syns, song_id, thread=True, first=False):
     """"populates related_thr and rhyme_related_thr columns of Song table.
     syns the list of synonims of a given word (along with their scores)"""
 
@@ -676,11 +575,21 @@ def populate_custom_song_async(syns, song_id, thread=True):
     song.update_related(related, last_words, sent, thread=thread)
     db.session.commit()
 
+    if first:
+        song.update_related_id(id=0, action='used', line_being_used=1)
+        lyric = [related[0][0], int(related[0][1])]
+        song.update_lyric(lyric)
+        song.about = song.about[1:]
+        print('----------------------------------------------- MAIN THREAD ENDED')
+        print('song_about: ', song.about)
+
+    db.session.commit()
 
 
-def populate_custom_song(syns, song_id, thread=True):
 
-    Thread(target=populate_custom_song_async, args=(syns, song_id, thread, )).start()
+def populate_custom_song(syns, song_id, thread=True, first=False):
+
+    Thread(target=populate_custom_song_async, args=(syns, song_id, thread, first, )).start()
 
 
 #words = ['adolescence', 'aluminum', 'applying', 'arab', 'ate', 'yesterday', 'writer', 'triceps']
@@ -763,8 +672,6 @@ def get_rhyme_related_by_id(rhyme_related, rhyme_related_ids, id, thresh=False):
         temp = possible_rhyme_related_ids[all_index_2[id_new] + 1:].find('-') + all_index_2[id_new] + 1
         sent_id = possible_rhyme_related_ids[temp + 1: all_index_2[id_new + 1]]
 
-    print(possible_rhyme_related, possible_rhyme_related_ids)
-
     return [sent, sent_id]
 
 def update_rhyme_related_id(rhyme_related_ids, sentence_id=-1, line_being_used=-1, action='new', thread=False):
@@ -796,8 +703,6 @@ def update_rhyme_related_id(rhyme_related_ids, sentence_id=-1, line_being_used=-
             rhyme_related_ids = rhyme_related_ids[:ind - 1] + '0' + rhyme_related_ids[ind:]
 
 
-        print(rhyme_related_ids)
-
 
 """
 rhyme_related = ';&business making sure that my calls &feed me dope and some false ;&all business if you hear cops ;&no business sitting on blades &peeps talking bout your box braids &no business sitting on blades &feed them on no dates &tried to feed them on dates &feed of my dates &to feed them on dates ;&a business man with racks &business up now he need ajax &it feed the motherfucker named blacks &you feed the motherfucker named blacks &even feed the motherfucker named blacks &business with the xanax'
@@ -807,7 +712,6 @@ rhyme_related_ids=  ';&0-1116318&0-3450951;&0-834343;&0-3037430&0-1693448&0-3037
 
 update_rhyme_related_id(rhyme_related_ids, sentence_id=sent_id, line_being_used=14, action='used', thread=False)
 """
-print(len(';&apple and eagle is the soundtrack &pressure i get any sack &the barrel watch the whole sack &a star like a tack &star flier than a tack &apple and eagle is the soundtrack &pressure i get any sack &the barrel watch the whole sack &a star like a tack &star flier than a tack &the star and your wack &rock star girls call me wack &a star and they fucking whack ;&apple and eagle is the soundtrack &pressure i get any sack &the barrel watch the whole sack &a star like a tack &star flier than a tack &apple and eagle is the soundtrack &pressure i get any sack &the barrel watch the whole sack &a star like a tack &star flier than a tack &the star and your wack &rock star girls call me wack &a star and they fucking whack ;&apple and eagle is the soundtrack &pressure i get any sack &the barrel watch the whole sack &a star like a tack &star flier than a tack &apple and eagle is the soundtrack &pressure i get any sack &the barrel watch the whole sack &a star like a tack &star flier than a tack &the star and your wack &rock star girls call me wack &a star and they fucking whack'))
 
 
 
