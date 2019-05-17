@@ -33,8 +33,9 @@
 
             {%if end == 0%}
             <h4>
-            <a href="{{ url_for('main.jinni_new_song_custom', liked=1, song_id=song_id) }}">
+            <a class="not-loading" href="{{ url_for('main.jinni_new_song_custom', liked=1, song_id=song_id) }}" onclick="$('.loading').show(); $('.not-loading').hide()")>
                 <img src="{{url_for('static', filename='images/add.jpg')}}" style="width:40px;height:40px;"></a>
+                <img class="loading" style="display:none; width:100px;height:100px;" src="{{ url_for('static', filename='images/load.gif') }}" alt="" />
             </h4>
             {%endif%}
             <h4>
@@ -42,6 +43,11 @@
                 <h4/>
             {%else%}
                 <h4><a href="{{url_for('main.jinni_new_song_custom', liked=2, song_id=song_id)}}">If nothing shows up, wait a few seconds and click here.</a></h4>
+                <br>
+                <h4 style="color:rgb(200,180,225)">If the link above is not working,<br> you can ask Jinni to instead write about:</h4>
+                {%for s in syn%}
+                <a href="{{ url_for('main.jinni_use_syn', song_id=song_id, syn=s) }}">{{s}},</a>
+                {%endfor%}
 
                 {%endif%}
 

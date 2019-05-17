@@ -295,7 +295,9 @@ def jinni_new_song_custom(song_id, liked):
 
         return render_template('jinni/jinni_new_song_custom.html', lyric=lyric_clean, song_id=song_id, ids=ids, end=0, about=about)
 
-    return render_template('jinni/jinni_new_song_custom.html', lyric=first_sentence, song_id=song_id, ids=ids, end=0, about=about)
+    synonyms = synonym_scrape(song.song_about())
+
+    return render_template('jinni/jinni_new_song_custom.html', lyric=first_sentence, song_id=song_id, ids=ids, end=0, about=about, syn=synonyms)
 
 @bp.route('/jinni_line_edit_custom/<song_id>/<line_id>', methods=['GET', 'POST'])
 def jinni_line_edit_custom(song_id, line_id):
@@ -392,18 +394,21 @@ def jinni_implement_recom_custom(recom, song_id, line_id):
             # TODO if this happens, but there's more than one sentence in rhyme_related/rhyme_related_thr, we just pick
             # a sentence that is different from related_id (need to change get_rhyme_related_by_id). If there's only one
             # sentence and its currently used, we do not wish this to happen (need to implement a check when sentence is first added to song)
-            [new_sentence, [possible_rhyme_related, possible_rhyme_related_ids]] = song.get_rhyme_related_by_id(related_id, thre)
+            try:
+                [new_sentence, [possible_rhyme_related, possible_rhyme_related_ids]] = song.get_rhyme_related_by_id(related_id, thre)
+                if thre:
+                    song.related_thr += ';' + new_sentence[0]
+                    song.related_ids_thr += ';' + str(line_id + 1) + '-' + new_sentence[1]
+                    song.rhyme_related_thr += ';' + possible_rhyme_related
+                    song.rhyme_related_ids_thr += ';' + possible_rhyme_related_ids
+                else:
+                    song.related += ';' + new_sentence[0]
+                    song.related_ids += ';' + str(line_id + 1) + '-' + new_sentence[1]
+                    song.rhyme_related += ';' + possible_rhyme_related
+                    song.rhyme_related_ids += ';' + possible_rhyme_related_ids
+            except ValueError:
+                new_sentence = generate_sentence(song.get_line_by_id(line_id))
 
-            if thre:
-                song.related_thr += ';' + new_sentence[0]
-                song.related_ids_thr += ';' + str(line_id+1) + '-' + new_sentence[1]
-                song.rhyme_related_thr += ';' + possible_rhyme_related
-                song.rhyme_related_ids_thr += ';' + possible_rhyme_related_ids
-            else:
-                song.related += ';' + new_sentence[0]
-                song.related_ids += ';' + str(line_id + 1) + '-' + new_sentence[1]
-                song.rhyme_related += ';' + possible_rhyme_related
-                song.rhyme_related_ids += ';' + possible_rhyme_related_ids
 
             db.session.commit()
 
