@@ -16,7 +16,7 @@
                                                     style="width:200px;height:200px;" alt="" />
         <h2 class="loading">Jinni is now rubbing his magic lamp to produce some great lyrics to you!</h2>
         <h2 id="timer_div"></h2>
-        <h2 id="go_build_lyric" style="display:none;"><a href="{{ url_for('main.jinni_new_song_custom', liked=2, song_id=song.id) }}">
+        <h2 id="go_build_lyric" style="display:none;"><a class="start_button" href="{{ url_for('main.jinni_new_song_custom', liked=2, song_id=song.id) }}">
             Click Here To Start!</a></h2>
         <h2 id="curious" style="color:rgb(255,255,140);">In the meantime, curious as to how Jinni works?</h2>
 
@@ -30,21 +30,23 @@
 
             <!-- Wrapper for slides -->
             <div class="carousel-inner">
-              <div class="item active">
-                <h3>There are two main aspects of songwriting Jinni implements<br><br><br><br><br><br><br></h3>
+              <div class="item active" style="font-style: italic">
+                  <h2 style="color:rgb(255,255,140);">To Sound Nice and Make Sense</h2>
+                <h3>There are two main aspects of songwriting that Jinni implements.<br><br><br><br><br><br><br></h3>
               </div>
 
-              <div class="item">
-                  <h3>Sonority: We implemented an algorithm to measure how well two <br>
-                      sentences rhyme based on a modified version of minimum edit <br>
-                      distance, the phonetic representation of words and Metaphone 3 encoding.<br><br><br><br><br></h3>
+              <div class="item" style="font-style: italic">
+                  <h2 style="color:rgb(255,255,140);">Sonority</h2>
+                  <h3>Jinni measures how well two sentences rhyme by<br>
+                      measuring their phonetic distance. For that, Jinni uses<br>
+                      <a href="#">word encoding</a> and its own <a href="#">edit distance algorithm</a><br><br><br><br><br></h3>
               </div>
 
-              <div class="item">
-                  <h3>Meaning: Our sentences are implemented by using Markov chains <br>
-                      in a similar way that word prediction algorithms work. We ensure <br>
-                      that sentences within a song match in meaning by using Word2Vec,<br>
-                      which is a machine learning Natural Language Processing algorithm.<br><br><br><br></h3>
+              <div class="item" style="font-style: italic">
+                  <h2 style="color:rgb(255,255,140);">Meaning</h2>
+                  <h3>Jinni uses <a href="#">Markov chains</a> to build new sentences.<br>
+                      It ensures that sentences are related in meaning <br>
+                      by using <a href="#">Word2Vec</a>, a machine learning algorithm.<br><br><br><br></h3>
               </div>
             </div>
 

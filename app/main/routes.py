@@ -227,7 +227,7 @@ def jinni_new_song_custom(song_id, liked):
         lyric_clean = song.part_1.split(';')[1:]
 
         ids = song.part_1_ids.split(';')[1:]
-        about = song.about.split(';')[0]
+        about = song.song_about()
         if len(song.part_1) >= 400:
             return render_template('jinni/jinni_new_song_custom.html', lyric=lyric_clean, song_id=song_id, ids=ids, end=1, about=about)
         else:
@@ -251,12 +251,19 @@ def jinni_new_song_custom(song_id, liked):
     if liked != '2':
 
         print('related: ', song.related)
+        print('')
         print('related_ids: ', song.related_ids)
+        print('')
         print('rhyme_related: ', song.rhyme_related)
+        print('')
         print('rhyme_related_ids: ', song.rhyme_related_ids)
+        print('')
         print('related_thr: ', song.related_thr)
+        print('')
         print('related_ids_thr: ', song.related_ids_thr)
+        print('')
         print('rhyme_related_thr: ', song.rhyme_related_thr)
+        print('')
         print('rhyme_related_ids_thr: ', song.rhyme_related_ids_thr)
 
 
@@ -375,27 +382,35 @@ def jinni_implement_recom_custom(recom, song_id, line_id):
     # if no recomendation was passed, generate new sentence based on line being changed (for now)
     if recom == '-none-':
 
-        # sentence must match in meaning with song.about and rhyme with succeding sentence
+        print('before---------------------------------------------------------')
+        print('related: ', song.related)
+        print('')
+        print('related_ids: ', song.related_ids)
+        print('')
+        print('rhyme_related: ', song.rhyme_related)
+        print('')
+        print('rhyme_related_ids: ', song.rhyme_related_ids)
+        print('')
+        print('related_thr: ', song.related_thr)
+        print('')
+        print('related_ids_thr: ', song.related_ids_thr)
+        print('')
+        print('rhyme_related_thr: ', song.rhyme_related_thr)
+        print('')
+        print('rhyme_related_ids_thr: ', song.rhyme_related_ids_thr)
+
         if line_id % 2 == 0:
 
-            # need to find where curr_sent is stored. There are two possibilities, related, related_thr,
-            # Then we pick a corresponding sentence in rhyme_related/rhyme_related_thr
-            # then we delete (mark as unused) the added sentence from rhyme_related_thr/rhyme_related and add it
-            # to related/related_thr.
-            # further, we copy the elements from the same rhyme_related/rhyme_related_thr class in to the new
-            # rhyme_related/rhyme_related_thr class correspondent to the added sentence
-
+            # find location of current sentence
             [related_id, thre] = song.get_related_id_by_line_id(line_id+1)
 
-            print('related_id: ', related_id)
-
             # gets new sentence that agrees with above
-            # TODO If there's not enough sentences in the corresponding rhyme_related/rhyme_related_thr, this will return -1
-            # TODO if this happens, but there's more than one sentence in rhyme_related/rhyme_related_thr, we just pick
-            # a sentence that is different from related_id (need to change get_rhyme_related_by_id). If there's only one
-            # sentence and its currently used, we do not wish this to happen (need to implement a check when sentence is first added to song)
             try:
                 [new_sentence, [possible_rhyme_related, possible_rhyme_related_ids]] = song.get_rhyme_related_by_id(related_id, thre)
+                # delete line from related/related_thr
+
+                song.update_related_id(id=related_id, action='del', thread=thre)
+                # adds new_sentence to related/related_thr and adds related sentences to rhyme_related/rhyme_related_thr
                 if thre:
                     song.related_thr += ';' + new_sentence[0]
                     song.related_ids_thr += ';' + str(line_id + 1) + '-' + new_sentence[1]
@@ -409,26 +424,41 @@ def jinni_implement_recom_custom(recom, song_id, line_id):
             except ValueError:
                 new_sentence = generate_sentence(song.get_line_by_id(line_id))
 
-
             db.session.commit()
-
-            print('related: ', song.related)
-            print('related_ids: ', song.related_ids)
-            print('rhyme_related: ', song.rhyme_related)
-            print('rhyme_related_ids: ', song.rhyme_related_ids)
-            print('related_thr: ', song.related_thr)
-            print('related_ids_thr: ', song.related_ids_thr)
-            print('rhyme_related_thr: ', song.rhyme_related_thr)
-            print('rhyme_related_ids_thr: ', song.rhyme_related_ids_thr)
 
         # TODO
         else:
-            #prev_sent = song.get_line_by_id(line_id - 1)
-            new_sentence = ['test', -1]
+            # should be analagous to above, but sentence needs to be found in rhyme_related/rhyme_related_thr.
+            # new sentence is picked from list of rhyme_related/rhyme_related_thr. we add/update flag of both sentences
+
+            # find location of current sentence
+            [rhyme_related_id, rhyme_related_sub_id, thre] = song.get_rhyme_related_id_by_line_id(line_id + 1)
+            print('rhyme_related_id: ', rhyme_related_id)
+
+            [new_sentence, [possible_rhyme_related, possible_rhyme_related_ids]] = song.get_rhyme_related_by_id(
+                rhyme_related_id, thre)
+
+
 
         song.update_line_id(line_id, str(new_sentence[1]))
         song.update_line(line_id, new_sentence[0])
         db.session.commit()
+        print('after---------------------------------------------------------')
+        print('related: ', song.related)
+        print('')
+        print('related_ids: ', song.related_ids)
+        print('')
+        print('rhyme_related: ', song.rhyme_related)
+        print('')
+        print('rhyme_related_ids: ', song.rhyme_related_ids)
+        print('')
+        print('related_thr: ', song.related_thr)
+        print('')
+        print('related_ids_thr: ', song.related_ids_thr)
+        print('')
+        print('rhyme_related_thr: ', song.rhyme_related_thr)
+        print('')
+        print('rhyme_related_ids_thr: ', song.rhyme_related_ids_thr)
 
     # recom comes from database
     elif recom.find('!-!') != -1:
@@ -563,7 +593,7 @@ def jinni_implement_recom(recom, song_id, line_id):
 def jinni_publish_song(song_id):
 
     song = Songs.query.filter_by(id=song_id).first()
-    update_syns_rank(song.about, song.part_1)
+    #update_syns_rank(song.about, song.part_1)
     return render_template('jinni/jinni_publish_song.html')
 
 
@@ -593,10 +623,10 @@ def jinni_main():
         song.about = '==' + req_word + ';' + str(syns[0]) + ';' + str(syns[1])
         db.session.commit()
 
+        populate_custom_song(syns, song.id, thread=False, first=True)
+
         # populate the field related_thr and rhyme_related_thr by using thread
         populate_custom_song(syns, song.id)
-
-        populate_custom_song(syns, song.id, thread=False, first=True)
 
         return render_template('jinni/jinni_main_waiting.html', song=song)
         #return redirect(url_for('main.jinni_new_song_custom', liked=2, song_id=song.id))

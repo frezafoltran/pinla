@@ -189,6 +189,8 @@ class Songs(db.Model):
         last_words = list of last words of each sentence in new_related
         rhyming_sent = dictionary with last_words as keys and values are sentences that rhyme with key"""
 
+        first_that_has_rhymes = 0
+        not_yet = True
         if thread == False:
             for i in range(len(new_related)):
 
@@ -197,6 +199,11 @@ class Songs(db.Model):
                     self.related = self.related + ';' + new_related[i][0]
                     self.update_related_id(sentence_id=int(new_related[i][1]))
                     self.update_rhyme_related(rhyming_sent[last_words[i]])
+                    not_yet=False
+                else:
+                    if not_yet:
+                        first_that_has_rhymes = i+1
+
 
         else:
             for i in range(len(new_related)):
@@ -206,6 +213,13 @@ class Songs(db.Model):
                     self.related_thr = self.related_thr + ';' + new_related[i][0]
                     self.update_related_id(sentence_id=int(new_related[i][1]), thread=True)
                     self.update_rhyme_related(rhyming_sent[last_words[i]], thread=True)
+                    not_yet=False
+                else:
+                    if not_yet:
+                        first_that_has_rhymes = i+1
+
+        return first_that_has_rhymes
+
 
     def update_rhyme_related(self, sentences, related_id = -1, thread = False):
         """Given list of sentences that rhyme with an entry of self.related, updated rhyme_related column"""
@@ -239,7 +253,7 @@ class Songs(db.Model):
         We iterate between each having the '=' in the beggining. """
         self.part_1 = ''
         self.part_1_ids = ''
-        self.related = '='
+        self.related = ''
         self.related_ids = ''
         self.rhyme_related = ''
         self.rhyme_related_ids = ''
@@ -338,16 +352,24 @@ class Songs(db.Model):
                     self.related_ids = self.related_ids[:all_index[id]+1] + str(line_being_used) + '-' + self.related_ids[all_index[id]+3:]
 
             # deletes sentence from both related and related_ids
+            # TODO need to delete the corresponding rhyme_related and rhyme_related_ids
             elif action == 'del':
 
                 all_index_related = [m.start() for m in re.finditer(';', self.related)]
+                all_index_rhyme_related = [m.start() for m in re.finditer(';', self.rhyme_related)]
+                all_index_rhyme_related_ids = [m.start() for m in re.finditer(';', self.rhyme_related_ids)]
                 if len(all_index) == id + 1:
                     self.related_ids = self.related_ids[:all_index[id]]
                     self.related = self.related[:all_index_related[id]]
-
+                    self.rhyme_related = self.rhyme_related[:all_index_rhyme_related[id]]
+                    self.rhyme_related_ids = self.rhyme_related_ids[:all_index_rhyme_related_ids[id]]
                 else:
                     self.related_ids = self.related_ids[:all_index[id]] + self.related_ids[all_index[id + 1]:]
-                    self.related = self.related_ids[:all_index[id]] + self.related_ids[all_index[id + 1]:]
+                    self.related = self.related[:all_index_related[id]] + self.related[all_index_related[id + 1]:]
+                    self.rhyme_related = self.rhyme_related[:all_index_rhyme_related[id]] +\
+                                         self.rhyme_related[all_index_rhyme_related[id + 1]:]
+                    self.rhyme_related_ids = self.rhyme_related_ids[:all_index_rhyme_related_ids[id]] + \
+                                         self.rhyme_related_ids[all_index_rhyme_related_ids[id + 1]:]
 
         else:
             all_index = [m.start() for m in re.finditer(';', self.related_ids_thr)]
@@ -370,13 +392,20 @@ class Songs(db.Model):
             elif action == 'del':
 
                 all_index_related = [m.start() for m in re.finditer(';', self.related_thr)]
+                all_index_rhyme_related = [m.start() for m in re.finditer(';', self.rhyme_related_thr)]
+                all_index_rhyme_related_ids = [m.start() for m in re.finditer(';', self.rhyme_related_ids_thr)]
                 if len(all_index) == id + 1:
                     self.related_ids_thr = self.related_ids_thr[:all_index[id]]
                     self.related_thr = self.related_thr[:all_index_related[id]]
-
+                    self.rhyme_related_thr = self.rhyme_related_thr[:all_index_rhyme_related[id]]
+                    self.rhyme_related_ids_thr = self.rhyme_related_ids_thr[:all_index_rhyme_related_ids[id]]
                 else:
                     self.related_ids_thr = self.related_ids_thr[:all_index[id]] + self.related_ids_thr[all_index[id + 1]:]
-                    self.related_thr = self.related_ids_thr[:all_index[id]] + self.related_ids_thr[all_index[id + 1]:]
+                    self.related_thr = self.related_thr[:all_index_related[id]] + self.related_thr[all_index_related[id + 1]:]
+                    self.rhyme_related_thr = self.rhyme_related_thr[:all_index_rhyme_related[id]] + \
+                                         self.rhyme_related_thr[all_index_rhyme_related[id + 1]:]
+                    self.rhyme_related_ids_thr = self.rhyme_related_ids_thr[:all_index_rhyme_related_ids[id]] + \
+                                             self.rhyme_related_ids_thr[all_index_rhyme_related_ids[id + 1]:]
 
 
     def non_used(self, thread= False):
@@ -471,9 +500,67 @@ class Songs(db.Model):
 
             return [len(all_index) - 1, True]
 
+    def get_rhyme_related_id_by_line_id(self, line_id):
+        #line_id is assumed to start at 1. related_id is the positional id of sentence
 
-    def get_rhyme_related_by_id(self, id, thresh=False):
-        """"""
+        # TODO Need to check if this is going to cause problems if we try to access while thread is happening
+        #  TODO if it does, the idea is to return -1 and generate a new rhyming sentence.
+        index_1 = self.rhyme_related_ids.find(str(line_id)+'-')
+        index_2 = self.rhyme_related_ids_thr.find(str(line_id) + '-')
+
+        # found in the non-thread
+        if index_1 != -1:
+            all_index = [m.start() for m in re.finditer(';', self.rhyme_related_ids)]
+
+            for i in range(len(all_index)):
+                if all_index[i] > index_1:
+
+                    # find subindex (related to & flag)
+                    all_index_2 = [m.start() for m in
+                                   re.finditer('&', self.rhyme_related_ids[all_index[i - 1]:all_index[i]])]
+                    for j in range(len(all_index_2)):
+
+                        if self.rhyme_related_ids[
+                           all_index_2[j] + all_index[i - 1] + 1:all_index_2[j] + all_index[i - 1] + 1 + len
+                               (str(line_id))] == str(line_id):
+                            return [i - 1, j, False]
+
+            i = len(all_index)
+            all_index_2 = [m.start() for m in re.finditer('&', self.rhyme_related_ids[all_index[i - 1]:])]
+            for j in range(len(all_index_2)):
+
+                if self.rhyme_related_ids[
+                   all_index_2[j] + all_index[i - 1] + 1:all_index_2[j] + all_index[i - 1] + 1 + len(
+                       str(line_id))] == str(line_id):
+                    return [len(all_index) - 1, j, False]
+
+        if index_2 != -1:
+            all_index = [m.start() for m in re.finditer(';', self.rhyme_related_ids_thr)]
+
+            for i in range(len(all_index)):
+                if all_index[i] > index_2:
+
+                    # find subindex (related to & flag)
+                    all_index_2 = [m.start() for m in
+                                   re.finditer('&', self.rhyme_related_ids_thr[all_index[i - 1]:all_index[i]])]
+                    for j in range(len(all_index_2)):
+
+                        if self.rhyme_related_ids_thr[all_index_2[j] + all_index[i - 1] + 1:
+                                all_index_2[j] + all_index[i - 1] + 1 + len(str(line_id))] == str(line_id):
+                            return [i - 1, j, True]
+
+            i = len(all_index)
+            all_index_2 = [m.start() for m in re.finditer('&', self.rhyme_related_ids_thr[all_index[i - 1]:])]
+            for j in range(len(all_index_2)):
+
+                if self.rhyme_related_ids_thr[all_index_2[j] + all_index[i - 1] + 1:all_index_2[j] +
+                            all_index[i - 1] + 1 + len(str(line_id))] == str(line_id):
+                    return [len(all_index) - 1, j, True]
+
+
+    def get_rhyme_related_by_id(self, id, sub_id=-1, thresh=False):
+        """sub_id is only used when we wish to avoid using a certain sentence already present in
+        rhyme_related/rhyme_related_thr"""
 
         if not thresh:
             all_index = [m.start() for m in re.finditer(';', self.rhyme_related)]
@@ -505,6 +592,7 @@ class Songs(db.Model):
         all_index = [m.start() for m in re.finditer('&', possible_rhyme_related)]
         all_index_2 = [m.start() for m in re.finditer('&', possible_rhyme_related_ids)]
 
+        # pick sentence that has not been used
         c = 0
         id_new = -1
         for i in all_index_2:
@@ -513,27 +601,35 @@ class Songs(db.Model):
                 break
             c += 1
 
-        # no available related word,
+        # no available related word, pick random that's already used
         if id_new == -1:
-            if len(all_index_2) == 1:
-                return []
-            else:
-                id_new = random.randint(0,len(all_index_2)-1)
+            id_new = random.randint(0,len(all_index_2)-1)
 
         if id_new + 1 == len(all_index):
             sent = possible_rhyme_related[all_index[id_new] + 1:]
+            possible_rhyme_related_clean = possible_rhyme_related[:all_index[id_new]]
+
         else:
             sent = possible_rhyme_related[all_index[id_new] + 1: all_index[id_new + 1]]
+            possible_rhyme_related_clean = possible_rhyme_related[:all_index[id_new]] + \
+                                           possible_rhyme_related[all_index[id_new + 1]:]
 
+        #TODO possible_rhyme_related_ids_clean is not correct.
+        # perhaps think about finding the & symbols in the range of possible_rhyme_related and use id_new
+        # to scrape the correct ..._clean
         if id_new + 1 == len(all_index_2):
             temp = possible_rhyme_related_ids[all_index_2[id_new] + 1:].find('-') + all_index_2[id_new] + 1
             sent_id = possible_rhyme_related_ids[temp + 1:]
+            possible_rhyme_related_ids_clean = possible_rhyme_related_ids[:all_index_2[id_new]]
+
         else:
             temp = possible_rhyme_related_ids[all_index_2[id_new] + 1:].find('-') + all_index_2[id_new] + 1
             sent_id = possible_rhyme_related_ids[temp + 1: all_index_2[id_new + 1]]
+            possible_rhyme_related_ids_clean = possible_rhyme_related_ids[:all_index_2[id_new]] + \
+                                               possible_rhyme_related_ids[all_index_2[id_new + 1]:]
 
         # second part of output is to be used in jinni_implement_recom_custom (if recom == '-none-').
-        return [[sent, sent_id], [possible_rhyme_related, possible_rhyme_related_ids]]
+        return [[sent, sent_id], [possible_rhyme_related_clean, possible_rhyme_related_ids_clean]]
 
 
     def get_related_by_id(self, id, thread = False):

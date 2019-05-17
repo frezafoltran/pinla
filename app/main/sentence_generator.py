@@ -475,8 +475,13 @@ def sentence_related(syns, rhyme=[], num_words=5, t_lim = 7):
     words = []
     for i in range(0,num_words):
 
-        max_w2vec = max(syns[0].items(), key=operator.itemgetter(1))[0]
-        max_dic_syn = max(syns[1].items(), key=operator.itemgetter(1))[0]
+        try:
+            max_w2vec = max(syns[0].items(), key=operator.itemgetter(1))[0]
+            max_dic_syn = max(syns[1].items(), key=operator.itemgetter(1))[0]
+        except ValueError:
+            syns = [syns[0],syns[0]]
+            max_w2vec = max(syns[0].items(), key=operator.itemgetter(1))[0]
+            max_dic_syn = max(syns[1].items(), key=operator.itemgetter(1))[0]
 
         if syns[0][max_w2vec] > syns[1][max_dic_syn]:
             words.append(max_w2vec)
@@ -568,16 +573,15 @@ def populate_custom_song_async(syns, song_id, thread=True, first=False):
     for i in range(1):
         print('thread happening')
         temp = sentence_related(list_of_similar_words_updated(song.song_about()), rhyme=last_words, num_words=10)
-        print(temp)
         for s in temp:
             sent[s[2]].append([s[0], s[1]])
 
-    song.update_related(related, last_words, sent, thread=thread)
+    first_to_add = song.update_related(related, last_words, sent, thread=thread)
     db.session.commit()
 
     if first:
         song.update_related_id(id=0, action='used', line_being_used=1)
-        lyric = [related[0][0], int(related[0][1])]
+        lyric = [related[first_to_add][0], int(related[first_to_add][1])]
         song.update_lyric(lyric)
         song.about = song.about[1:]
         print('----------------------------------------------- MAIN THREAD ENDED')
@@ -592,126 +596,50 @@ def populate_custom_song(syns, song_id, thread=True, first=False):
     Thread(target=populate_custom_song_async, args=(syns, song_id, thread, first, )).start()
 
 
-#words = ['adolescence', 'aluminum', 'applying', 'arab', 'ate', 'yesterday', 'writer', 'triceps']
+def get_rhyme_related_id_by_line_id(rhyme_related_ids, line_id):
+    #line_id is assumed to start at 1. related_id is the positional id of sentence
 
-words = []
-
-
-for word in words:
-
-    print('------------------------------------------------------------------')
-    print(word)
-    syns = list_of_similar_words_updated(word)
-    print('syns: ', syns)
-    related = sentence_related(syns)
-    print('related: ', related)
-
-    last_words = []
-    for item in related:
-        temp = item[0].strip(' ').split(' ')[-1]
-        last_words.append(temp)
-    print('last_words:', last_words)
+    # TODO Need to check if this is going to cause problems if we try to access while thread is happening
+    #  TODO if it does, the idea is to return -1 and generate a new rhyming sentence.
+    index_1 = rhyme_related_ids.find(str(line_id)+'-')
 
 
+    # found in the non-thread
+    if index_1 != -1:
+        all_index = [m.start() for m in re.finditer(';', rhyme_related_ids)]
 
-    t_out = time.time()
-    temp = []
-    while temp == [] and time.time()-t_out < 400:
-        print('again')
-        temp = sentence_related(syns, rhyme=last_words, num_words=10)
-        print(time.time()-t_out)
+        for i in range(len(all_index)):
+            if all_index[i] > index_1:
 
-    print('total time: ', time.time()-t_out)
-    print(temp)
-    print(len(temp))
+                #find subindex (related to & flag)
+                all_index_2 = [m.start() for m in re.finditer('&', rhyme_related_ids[all_index[i-1]:all_index[i]])]
+                for j in range(len(all_index_2)):
 
+                    if rhyme_related_ids[all_index_2[j]+all_index[i-1]+1:all_index_2[j]+all_index[i-1]+1+len
+                            (str(line_id))] == str(line_id):
+                        return [i - 1, j, False]
 
-# -------------------------------------- JUST FOR TESTING
+        i = len(all_index)
+        all_index_2 = [m.start() for m in re.finditer('&', rhyme_related_ids[all_index[i - 1]:])]
+        for j in range(len(all_index_2)):
 
-def get_rhyme_related_by_id(rhyme_related, rhyme_related_ids, id, thresh=False):
-    """"""
+            if rhyme_related_ids[
+               all_index_2[j] + all_index[i - 1] + 1:all_index_2[j] + all_index[i - 1] + 1 + len(str(line_id))] == str(
+                    line_id):
+                return [len(all_index) - 1, j, False]
 
-    # find the range in rhyme_related and rhyme_related_ids that correspond to the requested related sentence
-    if not thresh:
-        all_index = [m.start() for m in re.finditer(';', rhyme_related)]
-        if id + 1 == len(all_index):
-            possible_rhyme_related = rhyme_related[all_index[id]+1:]
-        else:
-            possible_rhyme_related = rhyme_related[all_index[id]+1: all_index[id+1]]
-
-        all_index_2_perm = [m.start() for m in re.finditer(';', rhyme_related_ids)]
-        if id + 1 == len(all_index_2_perm):
-            possible_rhyme_related_ids = rhyme_related_ids[all_index_2_perm[id]+1:]
-        else:
-            possible_rhyme_related_ids = rhyme_related_ids[all_index_2_perm[id]+1: all_index_2_perm[id+1]]
-
-    all_index = [m.start() for m in re.finditer('&', possible_rhyme_related)]
-    all_index_2 = [m.start() for m in re.finditer('&', possible_rhyme_related_ids)]
-
-    c = 0
-    id_new = -1
-    for i in all_index_2:
-        if possible_rhyme_related_ids[i + 1] == '0':
-            id_new = c
-            break
-        c += 1
-
-    if id_new == -1:
-        return []
-
-    if id_new + 1 == len(all_index):
-        sent = possible_rhyme_related[all_index[id_new]+1:]
-    else:
-        sent = possible_rhyme_related[all_index[id_new]+1: all_index[id_new+1]]
-
-    if id_new + 1 == len(all_index_2):
-        temp = possible_rhyme_related_ids[all_index_2[id_new] + 1:].find('-') + all_index_2[id_new] + 1
-        sent_id = possible_rhyme_related_ids[temp+1:]
-
-    else:
-        temp = possible_rhyme_related_ids[all_index_2[id_new] + 1:].find('-') + all_index_2[id_new] + 1
-        sent_id = possible_rhyme_related_ids[temp + 1: all_index_2[id_new + 1]]
-
-    return [sent, sent_id]
-
-def update_rhyme_related_id(rhyme_related_ids, sentence_id=-1, line_being_used=-1, action='new', thread=False):
-    """ Updates the dynamodb id and line_being_used id of sentences in song.related column
-            Inputs:
-            sentence_id = dynamodb id of sentence
-            line_being_used = line in song that sentence is being used (index starts at 1)
-            action = what to to with sentence
-            """
-
-    if not thread:
-
-        #all_index = [m.start() for m in re.finditer(';', rhyme_related_ids)]
-
-        # adds new sentence. this is only called from update_related
-        if action == 'new':
-            rhyme_related_ids = rhyme_related_ids + '&0-' + str(sentence_id)
-
-
-        # updates status of sentence when sentence is added to ongoing lyrics
-        elif action == 'used':
-
-            ind = rhyme_related_ids.find('-'+sentence_id)
-            rhyme_related_ids = rhyme_related_ids[:ind-1] + str(line_being_used) + rhyme_related_ids[ind:]
-
-        # when user deletes sentence from rhyme_related_ids, we simply set its flag to 0 (as unused)
-        elif action == 'del':
-            ind = rhyme_related_ids.find('-' + sentence_id)
-            rhyme_related_ids = rhyme_related_ids[:ind - 1] + '0' + rhyme_related_ids[ind:]
+    return [-1, -1, -1]
 
 
 
-"""
-rhyme_related = ';&business making sure that my calls &feed me dope and some false ;&all business if you hear cops ;&no business sitting on blades &peeps talking bout your box braids &no business sitting on blades &feed them on no dates &tried to feed them on dates &feed of my dates &to feed them on dates ;&a business man with racks &business up now he need ajax &it feed the motherfucker named blacks &you feed the motherfucker named blacks &even feed the motherfucker named blacks &business with the xanax'
-rhyme_related_ids=  ';&0-1116318&0-3450951;&0-834343;&0-3037430&0-1693448&0-3037430&0-1636647&0-1636710&0-1636842&0-1636964;&0-735320&0-3374819&0-5130126&0-5130177&0-5130166&0-2954832'
+#rhyme_related = ';&business making sure that my calls &feed me dope and some false ;&all business if you hear cops ;&no business sitting on blades &peeps talking bout your box braids &no business sitting on blades &feed them on no dates &tried to feed them on dates &feed of my dates &to feed them on dates ;&a business man with racks &business up now he need ajax &it feed the motherfucker named blacks &you feed the motherfucker named blacks &even feed the motherfucker named blacks &business with the xanax'
+rhyme_related_ids=  ';&0-1116318&0-3450951;&0-834343;&0-3037430&0-1693448&0-3037430&0-1636647&0-1636710&1-1636842&0-1636964;&0-735320&0-3374819&0-5130126&0-5130177&2-5130166&12-2954832'
 
-[sent, sent_id] = get_rhyme_related_by_id(rhyme_related, rhyme_related_ids, 0, thresh=False)
+[id, id2, flag] = get_rhyme_related_id_by_line_id(rhyme_related_ids, 12)
+print(id, id2)
 
-update_rhyme_related_id(rhyme_related_ids, sentence_id=sent_id, line_being_used=14, action='used', thread=False)
-"""
+
+
 
 
 
