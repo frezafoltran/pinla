@@ -15,7 +15,13 @@
         <img class="loading" src="{{ url_for('static', filename='images/load.gif') }}"
                                                     style="width:200px;height:200px;" alt="" />
         <h2 class="loading">Jinni is now rubbing his magic lamp to produce some great lyrics to you!</h2>
-        <h2 id="timer_div"></h2>
+
+        <h2 id="loading_bar">
+            <img src="{{ url_for('static', filename='images/jinni_loading_lamp.gif') }}"
+                       alt="Jinni loading" style="width:400px;height:150px;">
+
+            <span style="padding-left:10px" id="timer_div"></span></h2>
+
         <h2 id="go_build_lyric" style="display:none;"><a class="start_button" href="{{ url_for('main.jinni_new_song_custom', liked=2, song_id=song.id) }}">
             Click Here To Start!</a></h2>
         <h2 id="curious" style="color:rgb(255,255,140);">In the meantime, curious as to how Jinni works?</h2>
@@ -83,19 +89,20 @@
 var seconds_left = 30;
 
 var interval = setInterval(function() {
-    document.getElementById('timer_div').innerHTML = "This should not take longer than " + --seconds_left + " seconds.";
+    document.getElementById('timer_div').innerHTML = "" + Math.trunc(100 - 3.3*(--seconds_left)) + " %";
 
     if ('{{song.about[1]|safe}}' != '=' || seconds_left <= 0)
     {
-       document.getElementById('timer_div').innerHTML = "Jinni is now ready!";
+       document.getElementById('timer_div').style.display = "none";
        document.getElementById('curious').innerHTML = "Curious as to how Jinni works?";
+       document.getElementById('loading_bar').style.display="none";
        clearInterval(interval);
        document.getElementById('go_build_lyric').style.display="block";
        document.getElementsByClassName('loading')[0].style.display="none";
        document.getElementsByClassName('loading')[1].style.display="none";
        document.getElementsByClassName('not-loading')[0].style.display="inline";
-
     }
+
 }, 1000);
 
 
