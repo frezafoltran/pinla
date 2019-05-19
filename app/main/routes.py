@@ -287,10 +287,11 @@ def jinni_new_song_custom(song_id, liked):
             [related_id, thre] = song.get_related_id_by_line_id(curr_line)
 
             # gets new sentence that agrees with above
-            [new_sentence, temp_discard] = song.get_rhyme_related_by_id(related_id, thre)
+            [new_sentence, [possible_rhyme_related, possible_rhyme_related_ids], id_new] = song.get_rhyme_related_by_id(related_id, thre)
 
             # updates sentence status:
-            song.update_rhyme_related_id(sentence_id=new_sentence[1], line_being_used=curr_line+1, action='used', thread=thre)
+            song.update_rhyme_related_id(sentence_id=new_sentence[1], ind_sub_ind=[related_id, id_new],
+                                         line_being_used=curr_line+1, action='used', thread=thre)
 
         # TODO Check why new_sentence is empty in some cases
         if new_sentence:
@@ -406,7 +407,7 @@ def jinni_implement_recom_custom(recom, song_id, line_id):
 
             # gets new sentence that agrees with above
             try:
-                [new_sentence, [possible_rhyme_related, possible_rhyme_related_ids]] = song.get_rhyme_related_by_id(related_id, thre)
+                [new_sentence, [possible_rhyme_related, possible_rhyme_related_ids], id_new] = song.get_rhyme_related_by_id(related_id, thre)
                 # delete line from related/related_thr
 
                 song.update_related_id(id=related_id, action='del', thread=thre)
@@ -422,6 +423,7 @@ def jinni_implement_recom_custom(recom, song_id, line_id):
                     song.rhyme_related += ';' + possible_rhyme_related
                     song.rhyme_related_ids += ';' + possible_rhyme_related_ids
             except ValueError:
+                flash('no more replacements available')
                 new_sentence = generate_sentence(song.get_line_by_id(line_id))
 
             db.session.commit()
@@ -433,12 +435,18 @@ def jinni_implement_recom_custom(recom, song_id, line_id):
 
             # find location of current sentence
             [rhyme_related_id, rhyme_related_sub_id, thre] = song.get_rhyme_related_id_by_line_id(line_id + 1)
-            print('rhyme_related_id: ', rhyme_related_id)
+            dynamo_id_curr = song.get_line_id_by_id(line_id)
 
-            [new_sentence, [possible_rhyme_related, possible_rhyme_related_ids]] = song.get_rhyme_related_by_id(
+            # get new sentence from same class in rhyme_related/rhyme_related_thr
+            [new_sentence, [possible_rhyme_related, possible_rhyme_related_ids], id_new] = song.get_rhyme_related_by_id(
                 rhyme_related_id, thre)
 
-
+            #updates flag of old sentence and new sentence
+            song.update_rhyme_related_id(sentence_id=dynamo_id_curr, ind_sub_ind=[rhyme_related_id, rhyme_related_sub_id],
+                                         action='del', thread=thre)
+            song.update_rhyme_related_id(sentence_id=new_sentence[1], ind_sub_ind=[rhyme_related_id, id_new],
+                                         line_being_used=line_id + 1, action='used', thread=thre)
+            db.session.commit()
 
         song.update_line_id(line_id, str(new_sentence[1]))
         song.update_line(line_id, new_sentence[0])
@@ -476,7 +484,7 @@ def jinni_implement_recom_custom(recom, song_id, line_id):
         # if edit was made by developer (marked by including (-commit-) at end of sentence)
         # we commit changes to database (i.e. this is made to correct sentences)
         dev_mark = recom.find('(-commit-)')
-        flash(dev_mark)
+
         if dev_mark != -1:
 
             # Only commit change if last word did not change
@@ -503,6 +511,19 @@ def jinni_implement_recom_custom(recom, song_id, line_id):
                 song.update_line_id(line_id, str(old_id))
                 song.update_line(line_id, recom)
                 db.session.commit()
+
+                # update sentence in related/related_thr
+                if line_id % 2 == 0:
+                    [related_id, thre] = song.get_related_id_by_line_id(line_id + 1)
+                    song.change_related(related_id, recom, thre=thre)
+
+                # update sentence in rhyme_related/rhyme_related_thr
+                else:
+                    [rhyme_related_id, rhyme_related_sub_id, thre] = song.get_rhyme_related_id_by_line_id(line_id + 1)
+                    song.change_rhyme_related([rhyme_related_id, rhyme_related_sub_id], recom, thre=thre)
+
+                db.session.commit()
+
             else:
                 flash('New sentence is too long.')
 

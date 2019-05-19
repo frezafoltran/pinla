@@ -247,6 +247,45 @@ class Songs(db.Model):
             # TODO update an existing entry of related column
 
 
+    def change_related(self, related_id, new_sent, thre=False):
+        """This is used in the manual edit mode. Method changes the sentence stored in related/related_thr field"""
+        if not thre:
+            all_index = [m.start() for m in re.finditer(';', self.related)]
+            if len(all_index) == related_id + 1:
+                self.related = self.related[:all_index[related_id]+1] + new_sent
+            else:
+                self.related = self.related[:all_index[related_id]+1] + new_sent + self.related[all_index[related_id+1]:]
+
+        else:
+            all_index = [m.start() for m in re.finditer(';', self.related_thr)]
+            if len(all_index) == related_id + 1:
+                self.related_thr = self.related_thr[:all_index[related_id] + 1] + new_sent
+            else:
+                self.related_thr = self.related_thr[:all_index[related_id] + 1] + new_sent + self.related_thr[
+                                                                                     all_index[related_id + 1]:]
+
+    def change_rhyme_related(self, rhyme_related_ids, new_sent, thre=False):
+        """This is used in the manual edit mode. Method changes the sentence stored in rhyme_related/rhyme_related_thr field"""
+        if not thre:
+            all_index_1 = [m.start() for m in re.finditer(';', self.rhyme_related)]
+            if len(all_index_1) == rhyme_related_ids[0] + 1:
+                all_index_2 = [m.start() for m in re.finditer(';', self.rhyme_related[all_index_1[rhyme_related_ids[0]]+1:])]
+            else:
+                all_index_2 = [m.start() for m in
+                               re.finditer(';', self.rhyme_related[all_index_1[rhyme_related_ids[0]]
+                                                                   +1:all_index_1[rhyme_related_ids[0]+1]])]
+
+            offset = all_index_1[rhyme_related_ids[0]]+1
+            if len(all_index_2) == rhyme_related_ids[1] + 1:
+                self.rhyme_related = self.rhyme_related[:offset + all_index_2[rhyme_related_ids[1]]+1] + new_sent
+            else:
+                self.rhyme_related = self.rhyme_related[:offset + all_index_2[rhyme_related_ids[1]]+1] + \
+                                     new_sent + self.rhyme_related[offset + all_index_2[rhyme_related_ids[1]+1]:]
+
+        else:
+            return
+
+
 
     def clear_lyrics(self):
         """self.related is initialized as '=' to indicate we start by using self.related instead of self.related_thr
@@ -281,7 +320,7 @@ class Songs(db.Model):
         return len([m.start() for m in re.finditer(';', self.part_1_ids)])
 
 
-    def update_rhyme_related_id(self, sentence_id=-1, line_being_used = -1, action='new', thread = False):
+    def update_rhyme_related_id(self, sentence_id=-1, ind_sub_ind=[], line_being_used = -1, action='new', thread = False):
         """ Updates the dynamodb id and line_being_used id of sentences in song.related column
                 Inputs:
                 sentence_id = dynamodb id of sentence
@@ -298,14 +337,36 @@ class Songs(db.Model):
 
             # updates status of sentence when sentence is added to ongoing lyrics
             elif action == 'used':
+                """
+                ind = [m.start() for m in re.finditer('-' + str(sentence_id), self.rhyme_related_ids)]
+                for inde in ind:
+                    self.rhyme_related_ids = self.rhyme_related_ids[:inde - 1] + str(line_being_used) + \
+                                             self.rhyme_related_ids[inde:]
+                                             """
+                ind_1 = [m.start() for m in re.finditer(';', self.rhyme_related_ids)]
+                ind_2 = [m.start() for m in re.finditer('&', self.rhyme_related_ids[ind_1[ind_sub_ind[0]]:])]
 
-                ind = self.rhyme_related_ids.find('-' + sentence_id)
-                self.rhyme_related_ids = self.rhyme_related_ids[:ind - 1] + str(line_being_used) + self.rhyme_related_ids[ind:]
+                self.rhyme_related_ids = self.rhyme_related_ids[:ind_1[ind_sub_ind[0]] + ind_2[ind_sub_ind[1]] + 1] \
+                                         + str(line_being_used) \
+                                         + self.rhyme_related_ids[ind_1[ind_sub_ind[0]]
+                                                                  + ind_2[ind_sub_ind[1]] + 2:]
+
 
             # when user deletes sentence from rhyme_related_ids, we simply set its flag to 0 (as unused)
             elif action == 'del':
-                ind = self.rhyme_related_ids.find('-' + sentence_id)
-                self.rhyme_related_ids = self.rhyme_related_ids[:ind - 1] + '0' + self.rhyme_related_ids[ind:]
+                """
+                ind = [m.start() for m in re.finditer('-' + str(sentence_id), self.rhyme_related_ids)]
+                for inde in ind:
+                    self.rhyme_related_ids = self.rhyme_related_ids[:inde - 1] + '0' + \
+                                             self.rhyme_related_ids[inde:]
+                                             """
+                ind_1 = [m.start() for m in re.finditer(';', self.rhyme_related_ids)]
+                ind_2 = [m.start() for m in re.finditer('&', self.rhyme_related_ids[ind_1[ind_sub_ind[0]]:])]
+
+                self.rhyme_related_ids = self.rhyme_related_ids[:ind_1[ind_sub_ind[0]] + ind_2[ind_sub_ind[1]] + 1] \
+                                         + '0' \
+                                         + self.rhyme_related_ids[ind_1[ind_sub_ind[0]]
+                                                                  + ind_2[ind_sub_ind[1]] + 2:]
 
         else:
             # adds new sentence. this is only called from update_related
@@ -315,16 +376,37 @@ class Songs(db.Model):
 
             # updates status of sentence when sentence is added to ongoing lyrics
             elif action == 'used':
+                """
+                ind = [m.start() for m in re.finditer('-' + str(sentence_id), self.rhyme_related_ids_thr)]
+                for inde in ind:
+                    self.rhyme_related_ids_thr = self.rhyme_related_ids_thr[:inde - 1] + str(line_being_used) + \
+                                             self.rhyme_related_ids_thr[inde:]
+                                             """
+                ind_1 = [m.start() for m in re.finditer(';', self.rhyme_related_ids_thr)]
+                ind_2 = [m.start() for m in re.finditer('&', self.rhyme_related_ids_thr[ind_1[ind_sub_ind[0]]:])]
 
-                ind = self.rhyme_related_ids_thr.find('-' + sentence_id)
-                self.rhyme_related_ids_thr = self.rhyme_related_ids_thr[:ind - 1] + str(line_being_used) + self.rhyme_related_ids_thr[ind:]
+                self.rhyme_related_ids_thr = self.rhyme_related_ids_thr[:ind_1[ind_sub_ind[0]] + ind_2[ind_sub_ind[1]] + 1] \
+                                         + str(line_being_used) \
+                                         + self.rhyme_related_ids_thr[ind_1[ind_sub_ind[0]]
+                                                                  + ind_2[ind_sub_ind[1]] + 2:]
+
 
             # when user deletes sentence from rhyme_related_ids, we simply set its flag to 0 (as unused)
             elif action == 'del':
-                ind = self.rhyme_related_ids_thr.find('-' + sentence_id)
-                self.rhyme_related_ids_thr = self.rhyme_related_ids_thr[:ind - 1] + '0' + self.rhyme_related_ids_thr[ind:]
+                """
+                ind = [m.start() for m in re.finditer('-' + str(sentence_id), self.rhyme_related_ids_thr)]
+                for inde in ind:
+                    self.rhyme_related_ids_thr = self.rhyme_related_ids_thr[:inde - 1] + '0' + \
+                                                 self.rhyme_related_ids_thr[inde:]
+                                                 """
+                ind_1 = [m.start() for m in re.finditer(';', self.rhyme_related_ids_thr)]
+                ind_2 = [m.start() for m in re.finditer('&', self.rhyme_related_ids_thr[ind_1[ind_sub_ind[0]]:])]
 
-
+                self.rhyme_related_ids_thr = self.rhyme_related_ids_thr[
+                                             :ind_1[ind_sub_ind[0]] + ind_2[ind_sub_ind[1]] + 1] \
+                                             + '0' \
+                                             + self.rhyme_related_ids_thr[ind_1[ind_sub_ind[0]]
+                                                                          + ind_2[ind_sub_ind[1]] + 2:]
 
 
     def update_related_id(self, sentence_id=-1, id=-1, line_being_used = -1, action='new', thread = False):
@@ -500,6 +582,10 @@ class Songs(db.Model):
 
             return [len(all_index) - 1, True]
 
+        # not found in any
+        if index_1 == -1 and index_2 == -1:
+            return[-1,-1]
+
     def get_rhyme_related_id_by_line_id(self, line_id):
         #line_id is assumed to start at 1. related_id is the positional id of sentence
 
@@ -629,7 +715,7 @@ class Songs(db.Model):
                                                possible_rhyme_related_ids[all_index_2[id_new + 1]:]
 
         # second part of output is to be used in jinni_implement_recom_custom (if recom == '-none-').
-        return [[sent, sent_id], [possible_rhyme_related_clean, possible_rhyme_related_ids_clean]]
+        return [[sent, sent_id], [possible_rhyme_related_clean, possible_rhyme_related_ids_clean], id_new]
 
 
     def get_related_by_id(self, id, thread = False):

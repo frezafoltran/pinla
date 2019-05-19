@@ -2,7 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6e1544a5-9068-4fd2-b76f-00741676af3c" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/main/routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/main/routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/templates/jinni/jinni_main.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/jinni/jinni_main.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/templates/jinni/jinni_main_waiting.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/jinni/jinni_main_waiting.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/templates/jinni/jinni_new_song_custom.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/jinni/jinni_new_song_custom.html" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -15,8 +20,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/templates/jinni/jinni_main.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1100">
-              <caret line="55" column="34" selection-start-line="55" selection-start-column="28" selection-end-line="55" selection-end-column="34" />
+            <state relative-caret-position="1260">
+              <caret line="63" column="60" selection-start-line="63" selection-start-column="60" selection-end-line="63" selection-end-column="60" />
               <folding>
                 <element signature="n#style#0;n#img#0;n#h1#0;n#head#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#span#0;n#form#0;n#div#0;n#div#1;n#div#0;n#!!top" expanded="true" />
@@ -26,16 +31,14 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/templates/jinni/jinni_main_waiting.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1128">
-              <caret line="28" column="30" lean-forward="true" selection-start-line="28" selection-start-column="30" selection-end-line="28" selection-end-column="30" />
+            <state relative-caret-position="-1174">
+              <caret line="22" column="25" selection-start-line="22" selection-start-column="25" selection-end-line="22" selection-end-column="25" />
               <folding>
                 <element signature="n#style#0;n#img#0;n#h1#0;n#head#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#img#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#img#1;n#h2#1;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#span#0;n#h2#1;n#div#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#h2#2;n#div#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#h2#3;n#div#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
@@ -52,11 +55,10 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/templates/jinni/jinni_new_song_custom.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="400">
-              <caret line="20" column="56" selection-start-line="20" selection-start-column="56" selection-end-line="20" selection-end-column="56" />
+            <state relative-caret-position="280">
+              <caret line="14" column="102" selection-start-line="14" selection-start-column="102" selection-end-line="14" selection-end-column="102" />
               <folding>
                 <element signature="n#style#0;n#img#0;n#h1#0;n#head#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#div#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#h3#0;n#div#0;n#div#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#img#0;n#h4#1;n#div#0;n#div#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#a#0;n#h4#2;n#div#0;n#div#0;n#!!top" expanded="true" />
@@ -97,11 +99,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="371">
-              <caret line="628" column="79" selection-start-line="628" selection-start-column="79" selection-end-line="628" selection-end-column="79" />
+            <state relative-caret-position="200">
+              <caret line="271" column="29" lean-forward="true" selection-start-line="271" selection-start-column="29" selection-end-line="271" selection-end-column="29" />
               <folding>
                 <element signature="e#0#29#0" expanded="true" />
               </folding>
@@ -110,19 +112,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/templates/base.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="200">
-              <caret line="52" column="34" selection-start-line="52" selection-start-column="34" selection-end-line="52" selection-end-column="50" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/main/routes.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="7760">
-              <caret line="408" column="92" selection-start-line="408" selection-start-column="92" selection-end-line="408" selection-end-column="115" />
+            <state relative-caret-position="331">
+              <caret line="520" column="21" lean-forward="true" selection-start-line="520" selection-start-column="21" selection-end-line="520" selection-end-column="21" />
               <folding>
                 <element signature="e#0#29#0" expanded="true" />
               </folding>
@@ -133,7 +126,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/main/sentence_generator.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="11400">
+            <state relative-caret-position="326">
               <caret line="582" column="35" selection-start-line="582" selection-start-column="35" selection-end-line="582" selection-end-column="35" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
@@ -146,11 +139,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>sentence_with_mod</find>
-      <find>sentence_with_mod_2</find>
-      <find>sentence_related_mod</find>
-      <find>TRANSITION_DURATION</find>
-      <find>get_related</find>
       <find>get_num</find>
       <find>get_line_by</find>
       <find>sentence_relat</find>
@@ -169,13 +157,18 @@
       <find>update_line_id</find>
       <find>ids</find>
       <find>get_rhyme</find>
-      <find>get_related_id_by_line_id</find>
       <find>song_line</find>
       <find>clear</find>
       <find>option</find>
       <find>update_related</find>
       <find>publish</find>
+      <find>jinni_new_song_custom</find>
       <find>get_rhyme_related_by_id</find>
+      <find>update_rhyme_rela</find>
+      <find>get_line_id_by_id</find>
+      <find>update_rhyme_related_id</find>
+      <find>update_rhyme_related</find>
+      <find>get_related_id_by_line_id</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -201,14 +194,14 @@
         <option value="$PROJECT_DIR$/app/main/forms.py" />
         <option value="$PROJECT_DIR$/app/main/jinni_custom_song_helper.py" />
         <option value="$PROJECT_DIR$/app/static/css/base.css" />
-        <option value="$PROJECT_DIR$/app/templates/jinni/jinni_main.html" />
         <option value="$PROJECT_DIR$/app/static/css/jinni_new_song.css" />
-        <option value="$PROJECT_DIR$/app/templates/jinni/jinni_new_song_custom.html" />
         <option value="$PROJECT_DIR$/app/main/sentence_generator.py" />
         <option value="$PROJECT_DIR$/app/static/css/jinni_main.css" />
-        <option value="$PROJECT_DIR$/app/main/routes.py" />
-        <option value="$PROJECT_DIR$/app/models.py" />
+        <option value="$PROJECT_DIR$/app/templates/jinni/jinni_main.html" />
         <option value="$PROJECT_DIR$/app/templates/jinni/jinni_main_waiting.html" />
+        <option value="$PROJECT_DIR$/app/templates/jinni/jinni_new_song_custom.html" />
+        <option value="$PROJECT_DIR$/app/models.py" />
+        <option value="$PROJECT_DIR$/app/main/routes.py" />
       </list>
     </option>
   </component>
@@ -223,7 +216,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -296,6 +288,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -382,7 +375,7 @@
     <frame x="-7" y="-7" width="1453" height="783" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49847096" visible="true" weight="0.15926708" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49847096" weight="0.15856236" />
       <window_info id="Structure" order="1" sideWeight="0.50152904" side_tool="true" weight="0.17829457" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -400,6 +393,25 @@
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
     </layout>
+    <layout-to-restore>
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49847096" visible="true" weight="0.15856236" />
+      <window_info id="Structure" order="1" sideWeight="0.50152904" side_tool="true" weight="0.17829457" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49753347" weight="0.23088685" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.39908257" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="bottom" id="Version Control" order="7" />
+      <window_info anchor="bottom" id="Terminal" order="8" />
+      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.5024665" side_tool="true" weight="0.29816514" />
+      <window_info anchor="bottom" id="Python Console" order="10" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+    </layout-to-restore>
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/migrations/versions/fef3f47c78c3_.py" />
@@ -648,34 +660,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/templates/jinni/jinni_main.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1100">
-          <caret line="55" column="34" selection-start-line="55" selection-start-column="28" selection-end-line="55" selection-end-column="34" />
-          <folding>
-            <element signature="n#style#0;n#img#0;n#h1#0;n#head#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#span#0;n#form#0;n#div#0;n#div#1;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#img#0;n#form#0;n#div#0;n#div#1;n#div#0;n#!!top" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/templates/jinni/jinni_new_song_custom.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="400">
-          <caret line="20" column="56" selection-start-line="20" selection-start-column="56" selection-end-line="20" selection-end-column="56" />
-          <folding>
-            <element signature="n#style#0;n#img#0;n#h1#0;n#head#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#h3#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#img#0;n#h4#1;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#a#0;n#h4#2;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#1;n#h4#2;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#h4#2;n#h4#2;n#div#0;n#div#0;n#!!top" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/static/css/jinni_new_song.css">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="880">
@@ -700,32 +684,14 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/main/routes.py">
+    <entry file="file://$PROJECT_DIR$/app/templates/jinni/jinni_main.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="7760">
-          <caret line="408" column="92" selection-start-line="408" selection-start-column="92" selection-end-line="408" selection-end-column="115" />
+        <state relative-caret-position="1260">
+          <caret line="63" column="60" selection-start-line="63" selection-start-column="60" selection-end-line="63" selection-end-column="60" />
           <folding>
-            <element signature="e#0#29#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/main/sentence_generator.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="11400">
-          <caret line="582" column="35" selection-start-line="582" selection-start-column="35" selection-end-line="582" selection-end-column="35" />
-          <folding>
-            <element signature="e#0#13#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/models.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="371">
-          <caret line="628" column="79" selection-start-line="628" selection-start-column="79" selection-end-line="628" selection-end-column="79" />
-          <folding>
-            <element signature="e#0#29#0" expanded="true" />
+            <element signature="n#style#0;n#img#0;n#h1#0;n#head#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#span#0;n#form#0;n#div#0;n#div#1;n#div#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#img#0;n#form#0;n#div#0;n#div#1;n#div#0;n#!!top" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -737,15 +703,23 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/app/main/sentence_generator.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="326">
+          <caret line="582" column="35" selection-start-line="582" selection-start-column="35" selection-end-line="582" selection-end-column="35" />
+          <folding>
+            <element signature="e#0#13#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/app/templates/jinni/jinni_main_waiting.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1128">
-          <caret line="28" column="30" lean-forward="true" selection-start-line="28" selection-start-column="30" selection-end-line="28" selection-end-column="30" />
+        <state relative-caret-position="-1174">
+          <caret line="22" column="25" selection-start-line="22" selection-start-column="25" selection-end-line="22" selection-end-column="25" />
           <folding>
             <element signature="n#style#0;n#img#0;n#h1#0;n#head#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#img#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#img#1;n#h2#1;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#span#0;n#h2#1;n#div#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#h2#2;n#div#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#h2#3;n#div#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
@@ -754,6 +728,41 @@
             <element signature="n#style#0;n#h2#0;n#div#1;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#div#2;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#h2#0;n#div#2;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/templates/jinni/jinni_new_song_custom.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="280">
+          <caret line="14" column="102" selection-start-line="14" selection-start-column="102" selection-end-line="14" selection-end-column="102" />
+          <folding>
+            <element signature="n#style#0;n#img#0;n#h1#0;n#head#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#h3#0;n#div#0;n#div#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#img#0;n#h4#1;n#div#0;n#div#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#a#0;n#h4#2;n#div#0;n#div#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#div#1;n#h4#2;n#div#0;n#div#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#h4#2;n#h4#2;n#div#0;n#div#0;n#!!top" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/main/routes.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="331">
+          <caret line="520" column="21" lean-forward="true" selection-start-line="520" selection-start-column="21" selection-end-line="520" selection-end-column="21" />
+          <folding>
+            <element signature="e#0#29#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="200">
+          <caret line="271" column="29" lean-forward="true" selection-start-line="271" selection-start-column="29" selection-end-line="271" selection-end-column="29" />
+          <folding>
+            <element signature="e#0#29#0" expanded="true" />
           </folding>
         </state>
       </provider>
