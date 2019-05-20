@@ -48,6 +48,11 @@ class JinniCustomSong(FlaskForm):
     def validate_req_word(self, req_word):
 
         req_word = str(req_word.data).lower()
+        one_word = req_word.strip(' ').split(' ')
+
+        if len(one_word) > 1:
+            raise ValidationError('Please type only one word.')
+
         if not req_word:
             raise ValidationError('Please type a word.')
 
@@ -57,6 +62,7 @@ class JinniCustomSong(FlaskForm):
                     'id': req_word
                 }
             )
+
             return response['Item']['rhymes']
         except KeyError:
             raise ValidationError(req_word + ' is not currently in the database')

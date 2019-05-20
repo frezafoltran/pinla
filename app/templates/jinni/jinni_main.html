@@ -3,7 +3,7 @@
 
 {%block app_content%}
     <head>
-        <h1><img class="not-loading" src="{{ url_for('static', filename='images/jinni_full.png') }}"
+        <h1><img src="{{ url_for('static', filename='images/jinni_full.png') }}"
                        alt="Jinni logo" style="width:140px;height:105px;"></h1>
         <link rel="stylesheet" href="{{ url_for('static', filename='css/jinni_main.css') }}">
 
@@ -17,9 +17,10 @@
     <div class="container">
 
         <div class="row">
+
             <div class="col-md-6 col-md-offset-3">
                 <h4>Jinni is an app that produces new rap songs on demand. To get the source code of the algorithm,
-                    you can visit our <a href="#">github</a> repository.</h4>
+                    you can visit our <a href="https://github.com/frezafoltran/pinla">github</a> repository.</h4>
                 <h4 class = "not-loading">Explore the options for building new rap
                     lyrics below!</h4>
             </div>
@@ -51,6 +52,8 @@
                 </form>
             </div>
 
+            <br>
+
             <div class="col-md-4">
                 <h4>Build rap lyric about one of our most common topics:</h4>
                 <div class="option_button"> Create a Song About:<br>
@@ -59,13 +62,18 @@
                 <a href="{{ url_for('main.jinni_use_syn', song_id=curr_song.id, syn='drug') }}">Drug</a>
                     </div>
             </div>
-
+            <br>
             <div class="col-md-4">
                 <h4>Build rap lyric without topic constraint.</h4>
                 <a href="{{ url_for('main.jinni_new_song', liked=2, song_id=curr_song.id) }}" class="option_button" style="text-decoration:  none;">
                     Create a Song!</a>
+                <br><br><br><br><br><br>
+                <a href = "https://www.buymeacoffee.com/aPSN8j2">
+                    <img src="{{ url_for('static', filename='images/buy_me_coffee_icon.png') }}" id="buy_me_coffee_icon">
+                </a>
             </div>
         </div>
+
     </div>
 
 {%endblock%}

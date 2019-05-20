@@ -12,6 +12,7 @@
     <h4><a href="{{ url_for('main.jinni_main') }}">Start Over</a></h4>
 
     <div class="row">
+
         <div class="col-lg-6 col-md-offset-3 song_display" style="padding-bottom: 14px; padding-top: 4px;">
             <h3 id="test" style="color:rgb(200,180,225)">The {{about}} song</h3>
 
@@ -32,11 +33,22 @@
             {%endfor%}
 
             {%if end == 0%}
+            {%if wait != 1%}
             <h4>
             <a class="not-loading" href="{{ url_for('main.jinni_new_song_custom', liked=1, song_id=song_id) }}" onclick="$('.loading').show(); $('.not-loading').hide()")>
                 <img src="{{url_for('static', filename='images/add.jpg')}}" style="width:40px;height:40px;"></a>
                 <img class="loading" style="display:none; width:100px;height:100px;" src="{{ url_for('static', filename='images/load.gif') }}" alt="" />
             </h4>
+            {%else%}
+            <h4 style="color:rgb(200,180,225);">
+            <a class="not-loading" href="{{ url_for('main.jinni_new_song_custom', liked=1, song_id=song_id) }}" onclick="$('.loading').show(); $('.not-loading').hide()")>
+                <img id="wait_done" src="{{url_for('static', filename='images/add.jpg')}}" style="width:40px;height:40px; display:none;"></a>
+                <img id="wait" class="loading" style="width:100px;height:100px;" src="{{ url_for('static', filename='images/load.gif') }}" alt="" />
+                <br><span id="wait_text">It seems like your song's topic is a bit rare for Jinni.<br>
+                Please wait <span style="" id="timer_div"></span> while Jinni generates more sentences then try again.</span>
+            </h4>
+
+            {%endif%}
             {%endif%}
             <h4>
             <a href="#" style="color:rgb(200,180,225)" onclick="LogInPopUp('dialog');">Publish your Song</a>
@@ -52,8 +64,6 @@
                 <br><h3>New User? Click<a href="#"> here</a> to create an account!</h3>
                 <a href="#" onclick="ClosePopUp('dialog');">Return to Song</a>
             </div>
-
-                <h4/>
             {%else%}
                 <h4><a href="{{url_for('main.jinni_new_song_custom', liked=2, song_id=song_id)}}">If nothing shows up, wait a few seconds and click here.</a></h4>
                 <br>
@@ -71,6 +81,13 @@
                 to start a new song.</h4>
             </div>
             {%endif%}
+        </div>
+
+        <div class="col-lg-6 col-md-offset-3">
+        <br>
+        <a href = "www.buymeacoffee.com/aPSN8j2">
+            <img src="{{ url_for('static', filename='images/buy_me_coffee_icon.png') }}" id="buy_me_coffee_icon">
+        </a>
         </div>
     </div>
 
@@ -186,6 +203,22 @@
             dlg.style.display = "none"
             document.body.style.overflowY = "scroll"
         }
+
+        var seconds_left = 10;
+
+        var interval = setInterval(function() {
+            document.getElementById('timer_div').innerHTML = (--seconds_left) + "s";
+
+            if (seconds_left <= 0)
+            {
+               document.getElementById('timer_div').style.display = "none";
+               document.getElementById('wait').style.display = "none";
+               document.getElementById('wait_text').style.display = "none";
+               document.getElementById('wait_done').style.display = "inline";
+
+            }
+
+        }, 1000);
 
 
     </script>

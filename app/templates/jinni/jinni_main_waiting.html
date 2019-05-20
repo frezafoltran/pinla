@@ -24,6 +24,18 @@
 
         <h2 id="go_build_lyric" style="display:none;"><a class="start_button" href="{{ url_for('main.jinni_new_song_custom', liked=2, song_id=song.id) }}">
            Start!</a></h2>
+
+        <br>
+        <h2 style="color:rgb(255,255,140);">When creating your own lyrics</h2>
+            <ul style="list-style-type: square;">
+               <li><h3>Click on the <img src="{{ url_for('static', filename='images/refresh.png') }}" alt="refresh" style="width:12px;height:12px;">
+            symbol next to any sentence to replace it.</h3></li>
+                <li><h3>Hover your mouse over any sentence to get possible replacements,<br>
+                then click the desired replacement if you wish to change the given sentence.</h3></li>
+                <li><h3>Click on "edit" next to any sentence to change it manually, <br>
+                    then click "commit" after changes were made.</h3></li>
+            </ul>
+        <br>
         <h2 id="curious" style="color:rgb(255,255,140);">In the meantime, curious as to how Jinni works?</h2>
 
           <div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="4000">

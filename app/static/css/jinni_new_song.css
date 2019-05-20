@@ -63,3 +63,13 @@ margin-top:-230px;   /* negative half of height above */
     height:20px;
 }
 
+#buy_me_coffee_icon {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    top: 0px;
+    right: 0px;
+    width:200px;
+    height:50px;
+}
+

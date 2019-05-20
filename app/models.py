@@ -269,10 +269,10 @@ class Songs(db.Model):
         if not thre:
             all_index_1 = [m.start() for m in re.finditer(';', self.rhyme_related)]
             if len(all_index_1) == rhyme_related_ids[0] + 1:
-                all_index_2 = [m.start() for m in re.finditer(';', self.rhyme_related[all_index_1[rhyme_related_ids[0]]+1:])]
+                all_index_2 = [m.start() for m in re.finditer('&', self.rhyme_related[all_index_1[rhyme_related_ids[0]]+1:])]
             else:
                 all_index_2 = [m.start() for m in
-                               re.finditer(';', self.rhyme_related[all_index_1[rhyme_related_ids[0]]
+                               re.finditer('&', self.rhyme_related[all_index_1[rhyme_related_ids[0]]
                                                                    +1:all_index_1[rhyme_related_ids[0]+1]])]
 
             offset = all_index_1[rhyme_related_ids[0]]+1
@@ -453,6 +453,10 @@ class Songs(db.Model):
                     self.rhyme_related_ids = self.rhyme_related_ids[:all_index_rhyme_related_ids[id]] + \
                                          self.rhyme_related_ids[all_index_rhyme_related_ids[id + 1]:]
 
+            elif action == 'unused':
+                sep = self.related_ids[all_index[id]:].find('-')
+                self.related_ids = self.related_ids[:all_index[id]+1] + '0' + self.related_ids[all_index[id]+sep:]
+
         else:
             all_index = [m.start() for m in re.finditer(';', self.related_ids_thr)]
 
@@ -546,6 +550,7 @@ class Songs(db.Model):
         return self.part_1[all_index[line_id] + 1:all_index[line_id+1]]
 
     def get_line_id_by_id(self, line_id):
+        """line_id here is the dynamodb id"""
 
         all_index = [m.start() for m in re.finditer(';', self.part_1_ids)]
 
@@ -678,6 +683,9 @@ class Songs(db.Model):
         all_index = [m.start() for m in re.finditer('&', possible_rhyme_related)]
         all_index_2 = [m.start() for m in re.finditer('&', possible_rhyme_related_ids)]
 
+        # flag to indicate whether same line is already
+        used_elsewhere = False
+
         # pick sentence that has not been used
         c = 0
         id_new = -1
@@ -689,6 +697,7 @@ class Songs(db.Model):
 
         # no available related word, pick random that's already used
         if id_new == -1:
+            used_elsewhere = True
             id_new = random.randint(0,len(all_index_2)-1)
 
         if id_new + 1 == len(all_index):
@@ -715,7 +724,7 @@ class Songs(db.Model):
                                                possible_rhyme_related_ids[all_index_2[id_new + 1]:]
 
         # second part of output is to be used in jinni_implement_recom_custom (if recom == '-none-').
-        return [[sent, sent_id], [possible_rhyme_related_clean, possible_rhyme_related_ids_clean], id_new]
+        return [[sent, sent_id], [possible_rhyme_related_clean, possible_rhyme_related_ids_clean], id_new, used_elsewhere]
 
 
     def get_related_by_id(self, id, thread = False):

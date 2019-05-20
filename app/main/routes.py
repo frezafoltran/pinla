@@ -287,17 +287,26 @@ def jinni_new_song_custom(song_id, liked):
             [related_id, thre] = song.get_related_id_by_line_id(curr_line)
 
             # gets new sentence that agrees with above
-            [new_sentence, [possible_rhyme_related, possible_rhyme_related_ids], id_new] = song.get_rhyme_related_by_id(related_id, thre)
+            [new_sentence, [possible_rhyme_related, possible_rhyme_related_ids], id_new, used_elsewhere] = \
+                song.get_rhyme_related_by_id(related_id, thre)
 
             # updates sentence status:
             song.update_rhyme_related_id(sentence_id=new_sentence[1], ind_sub_ind=[related_id, id_new],
                                          line_being_used=curr_line+1, action='used', thread=thre)
 
+        db.session.commit()
+
         # TODO Check why new_sentence is empty in some cases
         if new_sentence:
             song.update_lyric(new_sentence)
+            db.session.commit()
 
-        db.session.commit()
+        else:
+            lyric_clean = song.part_1.split(';')[1:]
+            ids = song.part_1_ids.split(';')[1:]
+            return render_template('jinni/jinni_new_song_custom.html', lyric=lyric_clean, song_id=song_id, ids=ids,
+                                   end=0, about=about, wait=1)
+
         lyric_clean = song.part_1.split(';')[1:]
         ids = song.part_1_ids.split(';')[1:]
 
@@ -404,24 +413,38 @@ def jinni_implement_recom_custom(recom, song_id, line_id):
 
             # find location of current sentence
             [related_id, thre] = song.get_related_id_by_line_id(line_id+1)
+            curr_line = song.get_line_by_id(line_id)
+            curr_id = song.get_line_id_by_id(line_id)
 
             # gets new sentence that agrees with above
             try:
-                [new_sentence, [possible_rhyme_related, possible_rhyme_related_ids], id_new] = song.get_rhyme_related_by_id(related_id, thre)
-                # delete line from related/related_thr
+                [new_sentence, [possible_rhyme_related, possible_rhyme_related_ids], id_new, used_elsewhere] = \
+                    song.get_rhyme_related_by_id(related_id, thre)
 
-                song.update_related_id(id=related_id, action='del', thread=thre)
+                # if new_sentence is already being used in lyric need to be careful.
+                # in this case, need to set the related/related_thr to unused but keep the rhyme_related/rhyme_related_thr
+                # to avoid crashing in the case:
+                # sentence at line_id=0 has only 1 related (which is put in line_id=1). Refresh line_id=0,
+                # then refresh line_id=1
+
+                if used_elsewhere:
+                    song.update_related_id(id=related_id, action='unused', thread=thre)
+
+                else:
+                    #delete line from related/related_thr
+                    song.update_related_id(id=related_id, action='del', thread=thre)
+
                 # adds new_sentence to related/related_thr and adds related sentences to rhyme_related/rhyme_related_thr
                 if thre:
                     song.related_thr += ';' + new_sentence[0]
                     song.related_ids_thr += ';' + str(line_id + 1) + '-' + new_sentence[1]
-                    song.rhyme_related_thr += ';' + possible_rhyme_related
-                    song.rhyme_related_ids_thr += ';' + possible_rhyme_related_ids
+                    song.rhyme_related_thr += ';' + possible_rhyme_related + '&' + curr_line
+                    song.rhyme_related_ids_thr += ';' + possible_rhyme_related_ids + '&' + '0-' + curr_id
                 else:
                     song.related += ';' + new_sentence[0]
                     song.related_ids += ';' + str(line_id + 1) + '-' + new_sentence[1]
-                    song.rhyme_related += ';' + possible_rhyme_related
-                    song.rhyme_related_ids += ';' + possible_rhyme_related_ids
+                    song.rhyme_related += ';' + possible_rhyme_related + '&' + curr_line
+                    song.rhyme_related_ids += ';' + possible_rhyme_related_ids + '&' + '0-' + curr_id
             except ValueError:
                 flash('no more replacements available')
                 new_sentence = generate_sentence(song.get_line_by_id(line_id))
@@ -438,8 +461,8 @@ def jinni_implement_recom_custom(recom, song_id, line_id):
             dynamo_id_curr = song.get_line_id_by_id(line_id)
 
             # get new sentence from same class in rhyme_related/rhyme_related_thr
-            [new_sentence, [possible_rhyme_related, possible_rhyme_related_ids], id_new] = song.get_rhyme_related_by_id(
-                rhyme_related_id, thre)
+            [new_sentence, [possible_rhyme_related, possible_rhyme_related_ids], id_new, used_elsewhere] = \
+                song.get_rhyme_related_by_id(rhyme_related_id, thre)
 
             #updates flag of old sentence and new sentence
             song.update_rhyme_related_id(sentence_id=dynamo_id_curr, ind_sub_ind=[rhyme_related_id, rhyme_related_sub_id],
@@ -501,6 +524,17 @@ def jinni_implement_recom_custom(recom, song_id, line_id):
 
                 song.update_line_id(line_id, str(old_id))
                 song.update_line(line_id, recom_new)
+
+                # update sentence in related/related_thr
+                if line_id % 2 == 0:
+                    [related_id, thre] = song.get_related_id_by_line_id(line_id + 1)
+                    song.change_related(related_id, recom_new, thre=thre)
+
+                # update sentence in rhyme_related/rhyme_related_thr
+                else:
+                    [rhyme_related_id, rhyme_related_sub_id, thre] = song.get_rhyme_related_id_by_line_id(line_id + 1)
+                    song.change_rhyme_related([rhyme_related_id, rhyme_related_sub_id], recom_new, thre=thre)
+
                 db.session.commit()
 
             else:
@@ -650,7 +684,6 @@ def jinni_main():
         populate_custom_song(syns, song.id)
 
         return render_template('jinni/jinni_main_waiting.html', song=song)
-        #return redirect(url_for('main.jinni_new_song_custom', liked=2, song_id=song.id))
 
     return render_template('jinni/jinni_main.html', curr_song=song, custom_song_form=custom_song_form, synonyms=synonyms)
 

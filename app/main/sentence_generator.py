@@ -596,47 +596,39 @@ def populate_custom_song(syns, song_id, thread=True, first=False):
     Thread(target=populate_custom_song_async, args=(syns, song_id, thread, first, )).start()
 
 
-def get_rhyme_related_id_by_line_id(rhyme_related_ids, line_id):
-    #line_id is assumed to start at 1. related_id is the positional id of sentence
+def song_id_encoder(id):
+    """Input is a string representing the id of a song. Outputs an encoded string to uniquely represent the song"""
+    codes = {'0': ['M', 'O', 'Y', 'S'], '1': ['N', 'O', 'A', 'I'], '2': ['V', 'G', 'I', 'K'], '3': ['L', 'M', 'B', 'K'],
+             '4': ['G', 'E', 'G', 'U'], '5': ['N', 'K', 'E', 'B'], '6': ['Y', 'P', 'G', 'Z'], '7': ['J', 'Z', 'K', 'Z'],
+             '8': ['L', 'K', 'J', 'B'], '9': ['P', 'N', 'G', 'V']}
 
-    # TODO Need to check if this is going to cause problems if we try to access while thread is happening
-    #  TODO if it does, the idea is to return -1 and generate a new rhyming sentence.
-    index_1 = rhyme_related_ids.find(str(line_id)+'-')
+    out = []
+    for num in list(id):
+        out += codes[num]
 
+    return ''.join(out)
 
-    # found in the non-thread
-    if index_1 != -1:
-        all_index = [m.start() for m in re.finditer(';', rhyme_related_ids)]
+def song_id_decoder(encoded_id):
+    codes = {'0': ['M', 'O', 'Y', 'S'], '1': ['N', 'O', 'A', 'I'], '2': ['V', 'G', 'I', 'K'], '3': ['L', 'M', 'B', 'K'],
+             '4': ['G', 'E', 'G', 'U'], '5': ['N', 'K', 'E', 'B'], '6': ['Y', 'P', 'G', 'Z'], '7': ['J', 'Z', 'K', 'Z'],
+             '8': ['L', 'K', 'J', 'B'], '9': ['P', 'N', 'G', 'V']}
 
-        for i in range(len(all_index)):
-            if all_index[i] > index_1:
+    out = ''
+    for i in range(0, len(encoded_id)-3, 4):
+        batch = encoded_id[i: i+4]
+        print(batch)
+        for key, val in codes.items():
+            if val == list(batch):
+                out += key
 
-                #find subindex (related to & flag)
-                all_index_2 = [m.start() for m in re.finditer('&', rhyme_related_ids[all_index[i-1]:all_index[i]])]
-                for j in range(len(all_index_2)):
-
-                    if rhyme_related_ids[all_index_2[j]+all_index[i-1]+1:all_index_2[j]+all_index[i-1]+1+len
-                            (str(line_id))] == str(line_id):
-                        return [i - 1, j, False]
-
-        i = len(all_index)
-        all_index_2 = [m.start() for m in re.finditer('&', rhyme_related_ids[all_index[i - 1]:])]
-        for j in range(len(all_index_2)):
-
-            if rhyme_related_ids[
-               all_index_2[j] + all_index[i - 1] + 1:all_index_2[j] + all_index[i - 1] + 1 + len(str(line_id))] == str(
-                    line_id):
-                return [len(all_index) - 1, j, False]
-
-    return [-1, -1, -1]
+    return out
 
 
 
-#rhyme_related = ';&business making sure that my calls &feed me dope and some false ;&all business if you hear cops ;&no business sitting on blades &peeps talking bout your box braids &no business sitting on blades &feed them on no dates &tried to feed them on dates &feed of my dates &to feed them on dates ;&a business man with racks &business up now he need ajax &it feed the motherfucker named blacks &you feed the motherfucker named blacks &even feed the motherfucker named blacks &business with the xanax'
-rhyme_related_ids=  ';&0-1116318&0-3450951;&0-834343;&0-3037430&0-1693448&0-3037430&0-1636647&0-1636710&1-1636842&0-1636964;&0-735320&0-3374819&0-5130126&0-5130177&2-5130166&12-2954832'
 
-[id, id2, flag] = get_rhyme_related_id_by_line_id(rhyme_related_ids, 12)
-print(id, id2)
+
+
+
 
 
 
