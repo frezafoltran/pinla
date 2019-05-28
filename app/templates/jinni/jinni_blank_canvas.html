@@ -1,0 +1,246 @@
+{%extends "base.html"%}
+{%import 'bootstrap/wtf.html' as wtf%}
+
+{%block app_content%}
+    <head>
+        <h1><img src="{{ url_for('static', filename='images/jinni_full.png') }}"
+                       alt="Jinni logo" style="width:140px;height:105px;"></h1>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/jinni_new_song.css') }}">
+    </head>
+    <h4>You can click on  the <img src="{{ url_for('static', filename='images/refresh.png') }}" style="width:12px;height:12px;">
+        symbol next to a sentence to replace it.
+        <br> Or you can click on the edit button to manually edit it.</h4>
+    <h4><a href="{{ url_for('main.jinni_main') }}">Start Over</a></h4>
+
+    <div class="row">
+
+        <div class="col-lg-6 col-md-offset-3 song_display" style="padding-bottom: 14px; padding-top: 4px;">
+            <h3 id="test" style="color:rgb(200,180,225)">The {{about}} song</h3>
+
+            {%if lyric%}
+            {%for line in lyric%}
+
+            <h4 class=""><!--this should be song_line-->
+
+                    <span style="display:none" >{{loop.index}} -~
+                    </span>
+                    <a href="{{url_for('main.jinni_implement_recom', recom='-none-', song_id=song.id, line_id=loop.index-1)}}">
+                        <img src="{{ url_for('static', filename='images/refresh.png') }}" style="width:12px;height:12px;"> </a>
+
+                    <span id="{{loop.index0}}" contenteditable="false" >{{line}}</span><span style="display:none">~</span>
+                    <button class="edit_button" onclick="editLine(this);">Edit</button>
+            </h4>
+
+            {%endfor%}
+
+                <form action="" method="post">
+                    <div class="row">
+                    {{new_line_form.hidden_tag() }}
+                    <div class="col-md-5 col-md-offset-1">
+                        <h4 style="color:rgb(200,180,225);">
+                    {{new_line_form.req_word.label}}<br>
+                            {{new_line_form.req_word(size=16)}}
+                        </h4>
+                    {% for error in new_line_form.req_word.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                        {%if synonyms%}
+                        <h4 class="not-loading">You can instead write about:</h4>
+                    {%for synonym in synonyms%}
+
+                    <h4><a class="not-loading" onclick="$('.loading').show(); $('.not-loading').hide()" href="{{ url_for('main.jinni_use_syn', syn=synonym, rhyme_with_line=rhyme_with_line, song_id=song.id) }}" >{{synonym}}</a></h4>
+
+                    {%endfor%}
+                        {%endif%}
+
+                    </div>
+                    <div class="col-md-5">
+                        <h4 style="color:rgb(200,180,225);">
+                    {{new_line_form.rhyme_with_line.label}}<br>
+                            {{new_line_form.rhyme_with_line(size=16)}}
+                        </h4>
+                    {% for error in new_line_form.rhyme_with_line.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                        {%if synonyms_rhyme%}
+                        <h4 class="not-loading">You can instead write about:</h4>
+                    {%for synonym in synonyms_rhyme%}
+
+                    <h4><a class="not-loading" onclick="$('.loading').show(); $('.not-loading').hide()" href="{{ url_for('main.jinni_use_syn', syn=-1, rhyme_with_line=synonym, song_id=song.id) }}" >{{synonym}}</a></h4>
+
+                    {%endfor%}
+                        {%endif%}
+                    </div>
+                    </div>
+                    <button style="background-color:rgb(255,240,255); border:none" onclick="$('.loading').show(); $('.not-loading').hide()" type=submit class="not-loading"><img src="{{url_for('static', filename='images/add.jpg')}}" style="width:40px;height:40px;"></button>
+                    <img class="loading" style="display:none; width:100px;height:100px;" src="{{ url_for('static', filename='images/load.gif') }}" alt="" />
+                </form>
+
+            <h4>
+            <a href="#" style="color:rgb(200,180,225)" onclick="LogInPopUp('dialog');">Publish your Song</a>
+
+            <div id="cover"></div>
+
+            <div id="dialog" style="background-color:rgb(200,210,255); margin-top:-300px; position:absolute;">
+                <a href="#" onclick="ClosePopUp('dialog');" id="x">x</a>
+                <h1>Sign In</h1>
+                <h2>So you can publish songs<br> and <br> have access to many other published songs!</h2>
+                <br><input type="text">
+                <br><input type="button" value="Submit">
+                <br><h3>New User? Click<a href="#"> here</a> to create an account!</h3>
+                <a href="#" onclick="ClosePopUp('dialog');">Return to Song</a>
+            </div>
+            {%else%}
+
+
+                {%endif%}
+
+            {%if end == 1%}
+            <div>
+                <h4 style="color:rgb(200,180,225)">Your cannot have more lines in this song.</h4>
+                <h4 style="color:rgb(200,180,225)">Click <a href="{{url_for('main.jinni_main')}}">here</a>
+                to start a new song.</h4>
+            </div>
+            {%endif%}
+        </div>
+
+        <div class="col-lg-6 col-md-offset-3">
+        <br>
+        <a href = "https://www.buymeacoffee.com/aPSN8j2">
+            <img src="{{ url_for('static', filename='images/buy_me_coffee_icon.png') }}" id="buy_me_coffee_icon">
+        </a>
+        </div>
+    </div>
+
+{%endblock%}
+
+{%block scripts%}
+    {{super()}}
+    {{moment.include_moment()}}
+    {{moment.lang(g.locale)}}
+    <script>
+
+        $(function () {
+            var timer = null;
+            var timer_2 = null;
+            var xhr = null;
+            var curr_text = null;
+            var temp = null;
+            var line_id = null;
+            var append = null;
+
+
+            $('.song_line').hover(
+                function(event) {
+                    // mouse in event handler
+                    if (timer_2){
+                        clearTimeout(timer_2);
+                        timer_2 = null;
+                    }
+
+                    else {
+                        var elem = $(event.currentTarget);
+                        timer = setTimeout(function() {
+                            timer = null;
+                            curr_text = elem.text().trim();
+                            temp = curr_text.indexOf('-');
+                            line_id = curr_text.substring(0, temp)-1;
+                            append = {{song_id|safe}} + '/' + line_id;
+
+                            xhr = $.ajax(
+                                '/jinni_line_edit_custom/' + append).done(
+                                    function(data) {
+                                        xhr = null;
+                                        elem.popover({
+                                            trigger: 'manual',
+                                            html: true,
+                                            animation: false,
+                                            container: elem,
+                                            content: data,
+                                            placement: "top"
+                                        }).popover('show');
+                                    }
+                                );
+                        }, 50);
+                    }
+                },
+                function(event) {
+                    // mouse out event handler
+                    var elem = $(event.currentTarget);
+                    if (timer) {
+                        clearTimeout(timer);
+                        timer = null;
+                    }
+                    else if (xhr) {
+                        xhr.abort();
+                        xhr = null;
+                    }
+                    else {
+                        elem.popover('destroy');
+                    }
+                }
+            );
+        });
+
+        function editLine(button) {
+
+            line_id = $(button).parent().text();
+            line_id = line_id.substring(0,line_id.indexOf('-')) - 1;
+
+            var x = document.getElementById(line_id);
+
+            if (x.contentEditable == "false") {
+                x.contentEditable = "true";
+                button.innerHTML = "Commit!";
+            } else {
+
+                //get rid of new line characters
+                new_line = $(button).parent().text();
+                new_line = new_line.substring(new_line.indexOf('~')+1,new_line.lastIndexOf('~') );
+                new_line = new_line.trim();
+
+                $.ajax('/jinni_implement_recom/' + new_line + '/'+ {{song.id|safe}} +'/' + line_id)
+
+                x.contentEditable = "false";
+                button.innerHTML = "Edit";
+            }
+        }
+
+
+        function LogInPopUp(el) {
+            var cvr = document.getElementById("cover")
+            var dlg = document.getElementById(el)
+            cvr.style.display = "block"
+            dlg.style.display = "block"
+            if (document.body.style.overflow = "hidden") {
+                cvr.style.width = "1024"
+                cvr.style.height = "100%"
+            }
+        }
+        function ClosePopUp(el) {
+            var cvr = document.getElementById("cover")
+            var dlg = document.getElementById(el)
+            cvr.style.display = "none"
+            dlg.style.display = "none"
+            document.body.style.overflowY = "scroll"
+        }
+
+        var seconds_left = 10;
+
+        var interval = setInterval(function() {
+            document.getElementById('timer_div').innerHTML = (--seconds_left) + "s";
+
+            if (seconds_left <= 0)
+            {
+               document.getElementById('timer_div').style.display = "none";
+               document.getElementById('wait').style.display = "none";
+               document.getElementById('wait_text').style.display = "none";
+               document.getElementById('wait_done').style.display = "inline";
+
+            }
+
+        }, 1000);
+
+
+    </script>
+{%endblock%}

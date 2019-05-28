@@ -6,19 +6,22 @@ from flask_babel import _, get_locale
 from guess_language import guess_language
 from app import db
 from app.main.forms import EditProfileForm, PostForm, \
-   SearchForm, JinniRhymeDistanceForm, JinniCustomSong, DefZeroProb
+   SearchForm, JinniRhymeDistanceForm, JinniCustomSong, DefZeroProb, JinniBlankCanvasForm
 from app.models import User, Post, Songs
 from app.translate import translate
 from app.main import bp
 from app.rhyme_distances import dist
 from app.main.sentence_generator import generate_sentence, find_suggestions, generate_sentence_lastword, \
     change_sent, sentence_related, update_syns_rank, list_of_similar_words_updated, string_to_dic, \
-    populate_custom_song, synonym_scrape
+    populate_custom_song, synonym_scrape, get_sent_with_rhyme
 from app.main.jinni_custom_song_helper import get_related
 import re
 import random
-
 import time
+import boto3
+
+dynamodb = boto3.resource("dynamodb")
+rhyme_table = dynamodb.Table("Rhyme")
 
 @bp.before_app_request
 def before_request():
@@ -563,24 +566,61 @@ def jinni_implement_recom_custom(recom, song_id, line_id):
 
     return redirect(url_for('main.jinni_new_song_custom', song_id=song_id, liked=3))
 
-@bp.route('/jinni_use_syn/<song_id>/<syn>')
-def jinni_use_syn(song_id, syn):
+@bp.route('/jinni_use_syn/<syn>/<rhyme_with_line>/<song_id>', methods=['GET', 'POST'])
+def jinni_use_syn(syn, rhyme_with_line, song_id):
 
-    song = Songs.query.filter_by(id=song_id).first()
+    if rhyme_with_line != '-1':
+
+        song = Songs.query.filter_by(id=song_id).first()
+        blank_canvas_form = JinniBlankCanvasForm()
+
+        try:
+            rhyme_with_line_int = int(rhyme_with_line)
+            is_int = True
+        except ValueError:
+            is_int = False
+
+        if is_int:
+
+            if rhyme_with_line != '-2':
+                sent = song.get_line_by_id(rhyme_with_line_int - 1)
+                rhyme_word = sent.strip(' ').split(' ')[-1]
+
+            else:
+                rhyme_word = ''
+
+        else:
+            rhyme_word = rhyme_with_line
+            if syn == '-1':
+                syn = ''
+
+        new_sent = -1
+        while new_sent == -1:
+            new_sent = get_sent_with_rhyme(syn, rhyme_word)
+
+        song.update_lyric(new_sent)
+        db.session.commit()
+        lyric_clean = song.part_1.split(';')[1:]
+
+        return render_template('jinni/jinni_blank_canvas.html', new_line_form=blank_canvas_form, lyric=lyric_clean,
+                               song=song)
+
+
+    song = Songs(part_1='', part_1_ids='')
+    db.session.add(song)
     song.clear_lyrics()
-    req_word = syn
+    song.about = syn
+    db.session.commit()
+    song.clear_lyrics()
 
-    # format string of similar words
-    syns = list_of_similar_words_updated(req_word)
-    song.about = '==' + req_word + ';' + str(syns[0]) + ';' + str(syns[1])
+    new_sent = -1
+    while new_sent == -1:
+        new_sent = get_sent_with_rhyme(syn)
+
+    song.update_lyric(new_sent)
     db.session.commit()
 
-    # populate the field related_thr and rhyme_related_thr by using thread
-    populate_custom_song(syns, song.id)
-
-    populate_custom_song(syns, song.id, thread=False, first=True)
-
-    return render_template('jinni/jinni_main_waiting.html', song=song)
+    return redirect(url_for('main.jinni_blank_canvas', song_id=song.id))
 
 
 @bp.route('/jinni_implement_recom/<recom>/<song_id>/<line_id>', methods=['GET', 'POST'])
@@ -591,7 +631,14 @@ def jinni_implement_recom(recom, song_id, line_id):
 
     # if no recomendation was passed, generate new sentence based on line being changed (for now)
     if recom == '-none-':
-        recom_new = generate_sentence(song.get_line_by_id(line_id))
+
+        related = song.get_line_by_id(line_id)
+        related = related.strip(' ').split(' ')[-1]
+
+        recom_new = -1
+        while recom_new == -1:
+            recom_new = get_sent_with_rhyme(related)
+
         song.update_line_id(line_id, str(recom_new[1]))
         song.update_line(line_id, recom_new[0])
         db.session.commit()
@@ -600,13 +647,14 @@ def jinni_implement_recom(recom, song_id, line_id):
     elif recom.find('!-!') != -1:
         sent = recom[:recom.find('!-!')]
         id = recom[recom.find('!-!') + 2:]
-        print(id)
+
         song.update_line_id(line_id, str(id))
         song.update_line(line_id, sent)
         db.session.commit()
 
     # recom comes from edit field
     else:
+
         old_id = song.get_line_id_by_id(line_id)
 
         # if edit was made by developer (marked by including (-commit-) at end of sentence)
@@ -642,7 +690,7 @@ def jinni_implement_recom(recom, song_id, line_id):
             else:
                 flash('New sentence is too long.')
 
-    return redirect(url_for('main.jinni_new_song', song_id=song_id, liked=3))
+    return redirect(url_for('main.jinni_blank_canvas', song_id=song.id))
 
 @bp.route('/jinni_publish_song/<song_id>', methods=['GET', 'POST'])
 def jinni_publish_song(song_id):
@@ -661,31 +709,242 @@ def jinni_main():
     if custom_song_form.is_submitted():
         synonyms = synonym_scrape(custom_song_form.req_word.data)
 
-    song = Songs(part_1='', part_1_ids='')
-    db.session.add(song)
-    song.clear_lyrics()
-    first_sentence = generate_sentence()
-    song.update_lyric(first_sentence)
-    db.session.commit()
-
     if custom_song_form.validate_on_submit():
 
-        song.clear_lyrics()
-        req_word = custom_song_form.req_word.data.lower()
 
-        #format string of similar words
-        syns = list_of_similar_words_updated(req_word)
-        song.about = '==' + req_word + ';' + str(syns[0]) + ';' + str(syns[1])
+        req_word = custom_song_form.req_word.data.lower()
+        song = Songs(part_1='', part_1_ids='')
+        db.session.add(song)
+        song.clear_lyrics()
+
+        first_sent = -1
+        while first_sent == -1:
+            first_sent = get_sent_with_rhyme(req_word)
+
+        song.update_lyric(first_sent)
+        song.about = req_word
         db.session.commit()
 
-        populate_custom_song(syns, song.id, thread=False, first=True)
+        return redirect(url_for('main.jinni_blank_canvas', song_id=song.id))
 
-        # populate the field related_thr and rhyme_related_thr by using thread
-        populate_custom_song(syns, song.id)
+    return render_template('jinni/jinni_main.html', custom_song_form=custom_song_form, synonyms=synonyms)
 
-        return render_template('jinni/jinni_main_waiting.html', song=song)
+@bp.route('/jinni_blank_canvas/<song_id>/', methods=['GET', 'POST'])
+def jinni_blank_canvas(song_id):
 
-    return render_template('jinni/jinni_main.html', curr_song=song, custom_song_form=custom_song_form, synonyms=synonyms)
+    song = Songs.query.filter_by(id=song_id).first()
+    blank_canvas_form = JinniBlankCanvasForm(req_word=song.about, rhyme_with_line=1)
+    lyric_clean = song.part_1.split(';')[1:]
+    synonyms = []
+    synonyms_rhyme = []
+    rhyme_with_line = -1
+    new_sent = -1
+
+    if blank_canvas_form.is_submitted():
+
+        try:
+            rhyme_with_line_int = int(blank_canvas_form.rhyme_with_line.data)
+            is_int = True
+        except ValueError:
+            is_int = False
+
+        # checks if req_word is in database
+        if blank_canvas_form.req_word.data:
+            try:
+                response = rhyme_table.get_item(
+                    Key={
+                        'id': str(blank_canvas_form.req_word.data).lower()
+                    }
+                )
+
+                response['Item']['rhymes']
+                req_word_allowed = True
+
+            except KeyError:
+                blank_canvas_form.req_word.errors = [str(blank_canvas_form.req_word.data) +
+                                                     ' is not currently in the database']
+                synonyms = synonym_scrape(blank_canvas_form.req_word.data)
+                req_word_allowed = False
+                rhyme_with_line = -2
+
+        if blank_canvas_form.rhyme_with_line.data and not is_int:
+
+            try:
+                response = rhyme_table.get_item(
+                    Key={
+                        'id': blank_canvas_form.rhyme_with_line.data.lower()
+                    }
+                )
+
+                response['Item']['rhymes']
+                req_rhyme_allowed = True
+
+            except KeyError:
+                blank_canvas_form.rhyme_with_line.errors = [str(blank_canvas_form.rhyme_with_line.data) +
+                                                            ' is not currently in the database']
+                synonyms_rhyme = synonym_scrape(blank_canvas_form.rhyme_with_line.data.lower())
+                req_rhyme_allowed = False
+
+        if is_int:
+            # check if input is in range
+            if rhyme_with_line_int > song.get_num_lines():
+                blank_canvas_form.rhyme_with_line.errors = ['This must match one of the current lines in song.']
+
+            elif rhyme_with_line_int <= 0:
+                blank_canvas_form.rhyme_with_line.errors = ['This must be a positive integer.']
+
+            # rhyme_with_line is within range
+            else:
+                sent = song.get_line_by_id(rhyme_with_line_int - 1)
+                rhyme_word = sent.strip(' ').split(' ')[-1]
+
+                # check if req_word is in database
+                if blank_canvas_form.req_word.data and req_word_allowed:
+                    while new_sent == -1:
+                        new_sent = get_sent_with_rhyme(word=str(blank_canvas_form.req_word.data).lower(),
+                                                       rhyme=rhyme_word)
+                # generate sentence based only on rhyme
+                else:
+                    while new_sent == -1:
+                        new_sent = get_sent_with_rhyme(rhyme=rhyme_word)
+
+        else:
+            if blank_canvas_form.rhyme_with_line.data:
+
+                if blank_canvas_form.req_word.data and req_word_allowed:
+                    if req_rhyme_allowed:
+                        while new_sent == -1:
+                            new_sent = get_sent_with_rhyme(word=str(blank_canvas_form.req_word.data).lower(),
+                                                           rhyme=str(blank_canvas_form.rhyme_with_line.data).lower())
+
+                # TODO maybe delete this
+                else:
+                    if req_rhyme_allowed:
+                        while new_sent == -1:
+                            new_sent = get_sent_with_rhyme(rhyme=str(blank_canvas_form.rhyme_with_line.data).lower())
+
+            else:
+                if blank_canvas_form.req_word.data and req_word_allowed:
+                    while new_sent == -1:
+                        new_sent = get_sent_with_rhyme(word=str(blank_canvas_form.req_word.data).lower())
+
+                elif not blank_canvas_form.req_word.data:
+                    while new_sent == -1:
+                        new_sent = get_sent_with_rhyme(word=str())
+
+        if new_sent != -1:
+            song.update_lyric(new_sent)
+            db.session.commit()
+
+        lyric_clean = song.part_1.split(';')[1:]
+        return render_template('jinni/jinni_blank_canvas.html', new_line_form=blank_canvas_form,
+                               lyric=lyric_clean,
+                               song=song, synonyms=synonyms, synonyms_rhyme=synonyms_rhyme,
+                               rhyme_with_line=rhyme_with_line)
+
+
+        """
+        try:
+            rhyme_with_line_int = int(blank_canvas_form.rhyme_with_line.data)
+            is_int = True
+        except ValueError:
+            is_int = False
+
+
+        # if value of rhyme_with_line is out of range, raise error
+        if is_int and rhyme_with_line_int > song.get_num_lines():
+            blank_canvas_form.rhyme_with_line.errors = ['This must match one of the current lines in song.']
+
+        elif is_int and rhyme_with_line_int <= 0:
+            blank_canvas_form.rhyme_with_line.errors = ['This must be a positive integer.']
+
+        # if form is submitted empty, randomize
+        elif not blank_canvas_form.rhyme_with_line.data and not blank_canvas_form.req_word.data:
+
+            while new_sent == -1:
+                new_sent = get_sent_with_rhyme()
+
+
+        # if allowed rhyme_with_line and no req_word, randomize based on rhyme
+        elif not blank_canvas_form.req_word.data and blank_canvas_form.rhyme_with_line.data:
+
+            if is_int:
+                sent = song.get_line_by_id(rhyme_with_line_int - 1)
+                rhyme_word = sent.strip(' ').split(' ')[-1]
+                while new_sent == -1:
+                    new_sent = get_sent_with_rhyme(rhyme=rhyme_word)
+
+            else:
+                rhyme_word = blank_canvas_form.rhyme_with_line.data.lower()
+                try:
+                    response = rhyme_table.get_item(
+                        Key={
+                            'id': rhyme_word
+                        }
+                    )
+
+                    response['Item']['rhymes']
+
+                    while new_sent == -1:
+                        new_sent = get_sent_with_rhyme(rhyme=rhyme_word)
+
+                except KeyError:
+                    blank_canvas_form.rhyme_with_line.errors = [str(blank_canvas_form.rhyme_with_line.data) +
+                                                         ' is not currently in the database']
+                    synonyms_rhyme = synonym_scrape(rhyme_word)
+
+
+        # if req_word, check if word is in database. rhyme_with_line is already guaranteed to be either in
+        # range or empty
+        elif blank_canvas_form.req_word.data:
+            try:
+                response = rhyme_table.get_item(
+                    Key={
+                        'id': str(blank_canvas_form.req_word.data).lower()
+                    }
+                )
+
+                response['Item']['rhymes']
+
+                # TODO account for when there is both 
+                if blank_canvas_form.rhyme_with_line.data:
+                    if is_int:
+                        sent = song.get_line_by_id(rhyme_with_line_int - 1)
+                        rhyme_word = sent.strip(' ').split(' ')[-1]
+                    else:
+                        rhyme_word = ''
+
+                else:
+                    rhyme_word = ''
+
+                while new_sent == -1:
+                    new_sent = get_sent_with_rhyme(word=str(blank_canvas_form.req_word.data).lower(),
+                                                   rhyme=rhyme_word)
+
+            except KeyError:
+                blank_canvas_form.req_word.errors = [str(blank_canvas_form.req_word.data) +
+                                                     ' is not currently in the database']
+                synonyms = synonym_scrape(blank_canvas_form.req_word.data)
+
+                if blank_canvas_form.rhyme_with_line.data:
+                    rhyme_with_line = rhyme_with_line_int
+                else:
+                    rhyme_with_line = -2
+
+        if new_sent != -1:
+            song.update_lyric(new_sent)
+            db.session.commit()
+
+        lyric_clean = song.part_1.split(';')[1:]
+        return render_template('jinni/jinni_blank_canvas.html', new_line_form=blank_canvas_form,
+                               lyric=lyric_clean,
+                               song=song, synonyms=synonyms, synonyms_rhyme=synonyms_rhyme,
+                               rhyme_with_line=rhyme_with_line)
+                               """
+
+
+    return render_template('jinni/jinni_blank_canvas.html', new_line_form=blank_canvas_form, lyric=lyric_clean,
+                           song=song)
 
 @bp.route('/rn_main', methods=['GET', 'POST'])
 def rn_main():
