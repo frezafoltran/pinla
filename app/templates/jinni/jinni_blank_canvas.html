@@ -46,7 +46,7 @@
                     <div class="col-md-5 col-md-offset-1">
                         <h4 style="color:rgb(200,180,225);">
                     {{new_line_form.req_word.label}}<br>
-                            {{new_line_form.req_word(size=16)}}
+                            {{new_line_form.req_word(size=16, value=song.get_line_related(song.get_num_lines()-1))}}
                         </h4>
                     {% for error in new_line_form.req_word.errors %}
                     <span style="color: red;">[{{ error }}]</span>
@@ -66,7 +66,7 @@
                     <div class="col-md-5">
                         <h4 style="color:rgb(200,180,225);">
                     {{new_line_form.rhyme_with_line.label}}<br>
-                            {{new_line_form.rhyme_with_line(size=16)}}
+                            {{new_line_form.rhyme_with_line(size=16, value=song.get_num_lines() if song.get_num_lines() % 2 != 0 else '')}}
                         </h4>
                     {% for error in new_line_form.rhyme_with_line.errors %}
                     <span style="color: red;">[{{ error }}]</span>

@@ -394,7 +394,10 @@ def jinni_main():
 def jinni_blank_canvas(song_id, timeout):
 
     song = Songs.query.filter_by(id=song_id).first()
-    blank_canvas_form = JinniBlankCanvasForm(req_word=song.about, rhyme_with_line=1)
+
+    related = song.get_line_related(song.get_num_lines()-1)
+    blank_canvas_form = JinniBlankCanvasForm()
+
     lyric_clean = song.part_1.split(';')[1:]
     synonyms = []
     synonyms_rhyme = []
@@ -506,7 +509,7 @@ def jinni_blank_canvas(song_id, timeout):
                     new_sent = get_sent(word=str(blank_canvas_form.req_word.data).lower())
 
                 elif not blank_canvas_form.req_word.data:
-                    new_sent = get_sent(word=str())
+                    new_sent = get_sent()
 
         # timeout
         if new_sent == 1:
@@ -521,7 +524,7 @@ def jinni_blank_canvas(song_id, timeout):
 
         if new_sent != -1:
             if not blank_canvas_form.req_word.data or not req_word_allowed:
-                related = '-'
+                related = new_sent[2]
             else:
                 related = blank_canvas_form.req_word.data.lower()
 

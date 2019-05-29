@@ -13893,7 +13893,7 @@ def get_sent_with_rhyme(word='', rhyme='', num_words=10):
                         index = binarySearch(j['links'], 0, len(j['links'])-1, [int(k[0]), int(k[1])])
 
                         if index != -1:
-                            return [get_sent_by_id(index), index]
+                            return [get_sent_by_id(index), index, word]
 
                 except KeyError:
                     continue
