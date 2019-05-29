@@ -459,10 +459,8 @@ def jinni_blank_canvas(song_id, timeout):
                 synonyms_rhyme = synonym_scrape(blank_canvas_form.rhyme_with_line.data.lower())
                 req_rhyme_allowed = False
 
-        print(req_rhyme_allowed)
-        print(req_word_allowed)
         if not req_word_allowed or not req_rhyme_allowed:
-            print('---------------here')
+           
             lyric_clean = song.part_1.split(';')[1:]
             return render_template('jinni/jinni_blank_canvas.html', new_line_form=blank_canvas_form,
                                    lyric=lyric_clean,

@@ -13840,7 +13840,7 @@ def get_sent_with_rhyme(word='', rhyme='', num_words=10):
                 'ConsistentRead': True
             }
         },
-        ReturnConsumedCapacity='TOTAL'
+        #ReturnConsumedCapacity='TOTAL'
     )
 
     for i in range(len(response['Responses']['LyricLink'])):
