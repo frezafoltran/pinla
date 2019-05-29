@@ -229,7 +229,6 @@ def jinni_use_syn(syn, rhyme_with_line, song_id):
     if rhyme_with_line != '-1':
 
         song = Songs.query.filter_by(id=song_id).first()
-        blank_canvas_form = JinniBlankCanvasForm()
 
         try:
             rhyme_with_line_int = int(rhyme_with_line)
@@ -254,12 +253,12 @@ def jinni_use_syn(syn, rhyme_with_line, song_id):
 
         new_sent = get_sent(word=syn, rhyme=rhyme_word)
 
-        song.update_lyric(new_sent, syn)
-        db.session.commit()
-        lyric_clean = song.part_1.split(';')[1:]
+        if new_sent != 1:
 
-        return render_template('jinni/jinni_blank_canvas.html', new_line_form=blank_canvas_form,
-                               lyric=lyric_clean, song=song, end=0, timeout=0)
+            song.update_lyric(new_sent, syn)
+            db.session.commit()
+
+        return redirect(url_for('main.jinni_blank_canvas', song_id=song.id))
 
 
 
