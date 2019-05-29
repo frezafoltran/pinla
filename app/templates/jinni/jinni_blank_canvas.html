@@ -33,6 +33,7 @@
 
             {%endfor%}
 
+                {%if end == 0%}
                 <form action="" method="post">
                     <div class="row">
                     {{new_line_form.hidden_tag() }}
@@ -44,13 +45,15 @@
                     {% for error in new_line_form.req_word.errors %}
                     <span style="color: red;">[{{ error }}]</span>
                     {% endfor %}
-                        {%if synonyms%}
+                        {%if synonyms %}
+                        {%if timeout == 0%}
                         <h4 class="not-loading">You can instead write about:</h4>
                     {%for synonym in synonyms%}
 
                     <h4><a class="not-loading" onclick="$('.loading').show(); $('.not-loading').hide()" href="{{ url_for('main.jinni_use_syn', syn=synonym, rhyme_with_line=rhyme_with_line, song_id=song.id) }}" >{{synonym}}</a></h4>
 
                     {%endfor%}
+                        {%endif%}
                         {%endif%}
 
                     </div>
@@ -75,6 +78,15 @@
                     <button style="background-color:rgb(255,240,255); border:none" onclick="$('.loading').show(); $('.not-loading').hide()" type=submit class="not-loading"><img src="{{url_for('static', filename='images/add.jpg')}}" style="width:40px;height:40px;"></button>
                     <img class="loading" style="display:none; width:100px;height:100px;" src="{{ url_for('static', filename='images/load.gif') }}" alt="" />
                 </form>
+                {%endif%}
+
+            {%if timeout%}
+            <h4 style="color:rgb(200,180,225)">It seems the word you requested is a bit rare for Jinni<br>
+                you can ask Jinni to instead write about:</h4>
+                {%for s in synonyms%}
+                <a href="{{ url_for('main.jinni_use_syn', syn=s, rhyme_with_line=rhyme_with_line, song_id=song.id) }}">{{s}},</a>
+                {%endfor%}
+            {%endif%}
 
             <h4>
             <a href="#" style="color:rgb(200,180,225)" onclick="LogInPopUp('dialog');">Publish your Song</a>
@@ -90,9 +102,6 @@
                 <br><h3>New User? Click<a href="#"> here</a> to create an account!</h3>
                 <a href="#" onclick="ClosePopUp('dialog');">Return to Song</a>
             </div>
-            {%else%}
-
-
                 {%endif%}
 
             {%if end == 1%}
@@ -225,21 +234,6 @@
             document.body.style.overflowY = "scroll"
         }
 
-        var seconds_left = 10;
-
-        var interval = setInterval(function() {
-            document.getElementById('timer_div').innerHTML = (--seconds_left) + "s";
-
-            if (seconds_left <= 0)
-            {
-               document.getElementById('timer_div').style.display = "none";
-               document.getElementById('wait').style.display = "none";
-               document.getElementById('wait_text').style.display = "none";
-               document.getElementById('wait_done').style.display = "inline";
-
-            }
-
-        }, 1000);
 
 
     </script>

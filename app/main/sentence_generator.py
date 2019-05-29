@@ -13925,10 +13925,16 @@ def binarySearch(ids, l, r, range):
         # Element is not present in the array
         return -1
 
+def get_sent(word='', rhyme=''):
 
+    t = time.time()
+    new_sent = -1
+    while new_sent == -1:
+        if time.time() - t > 8:
+            return 1
+        new_sent = get_sent_with_rhyme(word=word, rhyme=rhyme)
 
-
-
+    return new_sent
 
 
 
