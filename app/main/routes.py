@@ -257,8 +257,9 @@ def jinni_use_syn(syn, rhyme_with_line, song_id):
 
             song.update_lyric(new_sent, syn)
             db.session.commit()
+            return redirect(url_for('main.jinni_blank_canvas', song_id=song.id, timeout=0))
 
-        return redirect(url_for('main.jinni_blank_canvas', song_id=song.id))
+        return redirect(url_for('main.jinni_blank_canvas', song_id=song.id, timeout=1))
 
 
 
@@ -271,10 +272,13 @@ def jinni_use_syn(syn, rhyme_with_line, song_id):
 
     new_sent = get_sent(word=syn)
 
-    song.update_lyric(new_sent, syn)
-    db.session.commit()
+    if new_sent != 1:
 
-    return redirect(url_for('main.jinni_blank_canvas', song_id=song.id))
+        song.update_lyric(new_sent, syn)
+        db.session.commit()
+        return redirect(url_for('main.jinni_blank_canvas', song_id=song.id, timeout=0))
+
+    return redirect(url_for('main.jinni_blank_canvas', song_id=song.id, timeout=1))
 
 
 @bp.route('/jinni_implement_recom/<recom>/<song_id>/<line_id>', methods=['GET', 'POST'])
@@ -293,10 +297,7 @@ def jinni_implement_recom(recom, song_id, line_id):
         recom_new = get_sent(word=related, rhyme=rhyme)
 
         if recom_new == 1:
-            lyric_clean = song.part_1.split(';')[1:]
-            blank_canvas_form = JinniBlankCanvasForm()
-            return render_template('jinni/jinni_blank_canvas.html', new_line_form=blank_canvas_form,
-                                   lyric=lyric_clean, song=song, end=0, timeout=1)
+            redirect(url_for('main.jinni_blank_canvas', song_id=song.id, timeout=1))
 
         song.update_line_id(line_id, str(recom_new[1]))
         song.update_line(line_id, recom_new[0])
@@ -349,7 +350,7 @@ def jinni_implement_recom(recom, song_id, line_id):
             else:
                 flash('New sentence is too long.')
 
-    return redirect(url_for('main.jinni_blank_canvas', song_id=song.id))
+    return redirect(url_for('main.jinni_blank_canvas', song_id=song.id, timeout=0))
 
 @bp.route('/jinni_publish_song/<song_id>', methods=['GET', 'POST'])
 def jinni_publish_song(song_id):
@@ -382,12 +383,15 @@ def jinni_main():
         song.about = req_word
         db.session.commit()
 
-        return redirect(url_for('main.jinni_blank_canvas', song_id=song.id))
+        if first_sent == 1:
+            return redirect(url_for('main.jinni_blank_canvas', song_id=song.id, timeout=1))
+
+        return redirect(url_for('main.jinni_blank_canvas', song_id=song.id, timeout=0))
 
     return render_template('jinni/jinni_main.html', custom_song_form=custom_song_form, synonyms=synonyms)
 
-@bp.route('/jinni_blank_canvas/<song_id>/', methods=['GET', 'POST'])
-def jinni_blank_canvas(song_id):
+@bp.route('/jinni_blank_canvas/<song_id>/<timeout>', methods=['GET', 'POST'])
+def jinni_blank_canvas(song_id, timeout):
 
     song = Songs.query.filter_by(id=song_id).first()
     blank_canvas_form = JinniBlankCanvasForm(req_word=song.about, rhyme_with_line=1)
@@ -398,6 +402,10 @@ def jinni_blank_canvas(song_id):
     new_sent = -1
     req_word_allowed = True
     req_rhyme_allowed = True
+
+    if timeout == 1:
+        return render_template('jinni/jinni_blank_canvas.html', new_line_form=blank_canvas_form, lyric=lyric_clean,
+                               song=song, end=1, timeout=1)
 
     if song.get_num_lines() >= 18:
         return render_template('jinni/jinni_blank_canvas.html', new_line_form=blank_canvas_form, lyric=lyric_clean,
