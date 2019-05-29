@@ -20,12 +20,18 @@
             {%if lyric%}
             {%for line in lyric%}
 
-            <h4 class=""><!--this should be song_line-->
+            <h4 style="width:100%" class=""><!--this should be song_line-->
+
+                    <span style="float:left; color:rgb(200,180,225); font-style: italic;">{{loop.index}}</span>
 
                     <span style="display:none" >{{loop.index}} -~
                     </span>
-                    <a href="{{url_for('main.jinni_implement_recom', recom='-none-', song_id=song.id, line_id=loop.index-1)}}">
+
+                    <a id="{{loop.index0}}_reroll" onclick="document.getElementById('{{loop.index0}}_reroll').style.display = 'none';
+                    document.getElementById('{{loop.index0}}_reroll_wait').style.display = 'inline';"
+                       href="{{url_for('main.jinni_implement_recom', recom='-none-', song_id=song.id, line_id=loop.index-1)}}">
                         <img src="{{ url_for('static', filename='images/refresh.png') }}" style="width:12px;height:12px;"> </a>
+                    <img id="{{loop.index0}}_reroll_wait" style="display:none; width:24px;height:24px;" src="{{ url_for('static', filename='images/load.gif') }}" alt="" />
 
                     <span id="{{loop.index0}}" contenteditable="false" >{{line}}</span><span style="display:none">~</span>
                     <button class="edit_button" onclick="editLine(this);">Edit</button>

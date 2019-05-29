@@ -170,10 +170,11 @@ class Songs(db.Model):
     # stores what song is about and similar words to what song is about
     about = db.Column(db.String(10000))
 
-    def update_lyric(self, new_line):
+    def update_lyric(self, new_line, related=''):
         """Adds new_line to song lyrics and updates correspoding dynamodb id"""
         self.part_1 = self.part_1 + ';' + new_line[0]
         self.part_1_ids = self.part_1_ids + ';' + str(new_line[1])
+        self.related = self.related + ';' + related
 
 
     def song_about(self):
@@ -181,6 +182,7 @@ class Songs(db.Model):
         ind = self.about.find(';')
         ind_2 = self.about.rfind('=')
         return self.about[ind_2+1:ind]
+
 
     def update_related(self, new_related, last_words, rhyming_sent, thread = False):
         """Given a list of new sentences, this function adds them to related and rhyme_related columns
@@ -548,6 +550,14 @@ class Songs(db.Model):
             return self.part_1[all_index[line_id]+1:]
 
         return self.part_1[all_index[line_id] + 1:all_index[line_id+1]]
+
+    def get_line_related(self, line_id):
+        all_index = [m.start() for m in re.finditer(';', self.related)]
+
+        if len(all_index) == line_id + 1:
+            return self.related[all_index[line_id] + 1:]
+
+        return self.related[all_index[line_id] + 1:all_index[line_id + 1]]
 
     def get_line_id_by_id(self, line_id):
         """line_id here is the dynamodb id"""

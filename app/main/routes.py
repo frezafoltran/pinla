@@ -155,170 +155,6 @@ def explore():
 
 
 
-@bp.route('/jinni_rhyme_distance', methods=['GET', 'POST'])
-def jinni_rhyme_distance():
-
-    form = JinniRhymeDistanceForm()
-    if form.validate_on_submit():
-        word_1 = form.word_1.data.lower()
-        word_2 = form.word_2.data.lower()
-        rhyme_at_start = form.rhyme_at_start.data
-        d = dist(word_1, word_2, rhyme_at_start)
-
-        return render_template('jinni/jinni_rhyme_distance.html', form=form, word_1=word_1, word_2=word_2, output=d)
-    return render_template('jinni/jinni_rhyme_distance.html', form=form, output=-4)
-
-
-@bp.route('/jinni_new_song/<song_id>/<liked>', methods=['GET', 'POST'])
-def jinni_new_song(song_id, liked):
-
-    # in case there was edit made
-    if liked == '3':
-        song = Songs.query.filter_by(id=song_id).first()
-        lyric_clean = song.part_1.split(';')[1:]
-
-        ids = song.part_1_ids.split(';')[1:]
-
-        if len(song.part_1) >= 400:
-            return render_template('jinni/jinni_new_song.html', lyric=lyric_clean, song_id=song_id, ids=ids, end=1)
-        else:
-            return render_template('jinni/jinni_new_song.html', lyric=lyric_clean, song_id=song_id, ids=ids, end=0)
-
-    song = Songs.query.filter_by(id=song_id).first()
-    lyric_clean = song.part_1.split(';')[1:]
-
-    first_sentence = song.part_1.split(';')[1:]
-    ids = song.part_1_ids.split(';')[1:]
-    song_len = len(song.part_1)
-
-    # stops if too many lines were produced
-    if song_len >= 400:
-
-        return render_template('jinni/jinni_new_song.html', lyric=lyric_clean, song_id=song_id, ids=ids, end=1)
-
-
-    # liked = 2 corresponds to initialization of song
-    if liked != '2':
-
-        # Makes pattern each pair of sentence rhymes
-        curr_line = song.get_num_lines()
-        if curr_line % 2 == 0:
-            new_sentence = generate_sentence()
-        else:
-            last_sent = song.get_last_line()
-            new_sentence = generate_sentence(last_sent)
-
-        #song.update_lyric(new_sentence[0])
-        #song.update_ids(str(new_sentence[1]))
-        song.update_lyric(new_sentence)
-        db.session.commit()
-        lyric_clean = song.part_1.split(';')[1:]
-        ids = song.part_1_ids.split(';')[1:]
-
-        return render_template('jinni/jinni_new_song.html', lyric=lyric_clean, song_id=song_id, ids=ids, end=0)
-
-    return render_template('jinni/jinni_new_song.html', lyric=first_sentence, song_id=song_id, ids=ids, end=0)
-
-
-@bp.route('/jinni_new_song_custom/<song_id>/<liked>', methods=['GET', 'POST'])
-def jinni_new_song_custom(song_id, liked):
-
-
-    # TODO in case there was edit made
-    if liked == '3':
-        song = Songs.query.filter_by(id=song_id).first()
-        lyric_clean = song.part_1.split(';')[1:]
-
-        ids = song.part_1_ids.split(';')[1:]
-        about = song.song_about()
-        if len(song.part_1) >= 400:
-            return render_template('jinni/jinni_new_song_custom.html', lyric=lyric_clean, song_id=song_id, ids=ids, end=1, about=about)
-        else:
-            return render_template('jinni/jinni_new_song_custom.html', lyric=lyric_clean, song_id=song_id, ids=ids, end=0, about=about)
-
-    song = Songs.query.filter_by(id=song_id).first()
-    about = song.song_about()
-    lyric_clean = song.part_1.split(';')[1:]
-
-    first_sentence = song.part_1.split(';')[1:]
-    ids = song.part_1_ids.split(';')[1:]
-    song_len = len(song.part_1)
-
-    # stops if too many lines were produced
-    if song_len >= 400:
-
-        return render_template('jinni/jinni_new_song_custom.html', lyric=lyric_clean, song_id=song_id, ids=ids, end=1, about=about)
-
-
-    # liked = 2 corresponds to initialization of song
-    if liked != '2':
-
-        print('related: ', song.related)
-        print('')
-        print('related_ids: ', song.related_ids)
-        print('')
-        print('rhyme_related: ', song.rhyme_related)
-        print('')
-        print('rhyme_related_ids: ', song.rhyme_related_ids)
-        print('')
-        print('related_thr: ', song.related_thr)
-        print('')
-        print('related_ids_thr: ', song.related_ids_thr)
-        print('')
-        print('rhyme_related_thr: ', song.rhyme_related_thr)
-        print('')
-        print('rhyme_related_ids_thr: ', song.rhyme_related_ids_thr)
-
-
-        curr_line = song.get_num_lines()
-        if curr_line % 2 == 0:
-
-            # indicates self.related is currently being used
-            if song.about[0] == '=':
-                thread_bool = False
-            # if song.related_thr is currently used
-            else:
-                thread_bool = True
-
-            # non_used is a list of the non-used sentences in related or related_thr
-            non_used = song.non_used(thread=thread_bool)
-            new_sentence = get_related(non_used, song.id, curr_line, thread=thread_bool)
-
-        else:
-
-            # gets id of previous line along with whether it belongs to related or related_thr
-            [related_id, thre] = song.get_related_id_by_line_id(curr_line)
-
-            # gets new sentence that agrees with above
-            [new_sentence, [possible_rhyme_related, possible_rhyme_related_ids], id_new, used_elsewhere] = \
-                song.get_rhyme_related_by_id(related_id, thre)
-
-            # updates sentence status:
-            song.update_rhyme_related_id(sentence_id=new_sentence[1], ind_sub_ind=[related_id, id_new],
-                                         line_being_used=curr_line+1, action='used', thread=thre)
-
-        db.session.commit()
-
-        # TODO Check why new_sentence is empty in some cases
-        if new_sentence:
-            song.update_lyric(new_sentence)
-            db.session.commit()
-
-        else:
-            lyric_clean = song.part_1.split(';')[1:]
-            ids = song.part_1_ids.split(';')[1:]
-            return render_template('jinni/jinni_new_song_custom.html', lyric=lyric_clean, song_id=song_id, ids=ids,
-                                   end=0, about=about, wait=1)
-
-        lyric_clean = song.part_1.split(';')[1:]
-        ids = song.part_1_ids.split(';')[1:]
-
-        return render_template('jinni/jinni_new_song_custom.html', lyric=lyric_clean, song_id=song_id, ids=ids, end=0, about=about)
-
-    synonyms = synonym_scrape(song.song_about())
-
-    return render_template('jinni/jinni_new_song_custom.html', lyric=first_sentence, song_id=song_id, ids=ids, end=0, about=about, syn=synonyms)
-
 @bp.route('/jinni_line_edit_custom/<song_id>/<line_id>', methods=['GET', 'POST'])
 def jinni_line_edit_custom(song_id, line_id):
 
@@ -385,189 +221,10 @@ def jinni_line_edit(song_id, line_id):
 
     return render_template('jinni/jinni_line_edit.html', suggestions=suggestions, song_id=song_id, line_id=line_id)
 
-@bp.route('/jinni_implement_recom_custom/<recom>/<song_id>/<line_id>', methods=['GET', 'POST'])
-def jinni_implement_recom_custom(recom, song_id, line_id):
-
-    song = Songs.query.filter_by(id=song_id).first()
-    # line_id starts at 0
-    line_id = int(line_id)
-
-    # if no recomendation was passed, generate new sentence based on line being changed (for now)
-    if recom == '-none-':
-
-        print('before---------------------------------------------------------')
-        print('related: ', song.related)
-        print('')
-        print('related_ids: ', song.related_ids)
-        print('')
-        print('rhyme_related: ', song.rhyme_related)
-        print('')
-        print('rhyme_related_ids: ', song.rhyme_related_ids)
-        print('')
-        print('related_thr: ', song.related_thr)
-        print('')
-        print('related_ids_thr: ', song.related_ids_thr)
-        print('')
-        print('rhyme_related_thr: ', song.rhyme_related_thr)
-        print('')
-        print('rhyme_related_ids_thr: ', song.rhyme_related_ids_thr)
-
-        if line_id % 2 == 0:
-
-            # find location of current sentence
-            [related_id, thre] = song.get_related_id_by_line_id(line_id+1)
-            curr_line = song.get_line_by_id(line_id)
-            curr_id = song.get_line_id_by_id(line_id)
-
-            # gets new sentence that agrees with above
-            try:
-                [new_sentence, [possible_rhyme_related, possible_rhyme_related_ids], id_new, used_elsewhere] = \
-                    song.get_rhyme_related_by_id(related_id, thre)
-
-                # if new_sentence is already being used in lyric need to be careful.
-                # in this case, need to set the related/related_thr to unused but keep the rhyme_related/rhyme_related_thr
-                # to avoid crashing in the case:
-                # sentence at line_id=0 has only 1 related (which is put in line_id=1). Refresh line_id=0,
-                # then refresh line_id=1
-
-                if used_elsewhere:
-                    song.update_related_id(id=related_id, action='unused', thread=thre)
-
-                else:
-                    #delete line from related/related_thr
-                    song.update_related_id(id=related_id, action='del', thread=thre)
-
-                # adds new_sentence to related/related_thr and adds related sentences to rhyme_related/rhyme_related_thr
-                if thre:
-                    song.related_thr += ';' + new_sentence[0]
-                    song.related_ids_thr += ';' + str(line_id + 1) + '-' + new_sentence[1]
-                    song.rhyme_related_thr += ';' + possible_rhyme_related + '&' + curr_line
-                    song.rhyme_related_ids_thr += ';' + possible_rhyme_related_ids + '&' + '0-' + curr_id
-                else:
-                    song.related += ';' + new_sentence[0]
-                    song.related_ids += ';' + str(line_id + 1) + '-' + new_sentence[1]
-                    song.rhyme_related += ';' + possible_rhyme_related + '&' + curr_line
-                    song.rhyme_related_ids += ';' + possible_rhyme_related_ids + '&' + '0-' + curr_id
-            except ValueError:
-                flash('no more replacements available')
-                new_sentence = generate_sentence(song.get_line_by_id(line_id))
-
-            db.session.commit()
-
-        # TODO
-        else:
-            # should be analagous to above, but sentence needs to be found in rhyme_related/rhyme_related_thr.
-            # new sentence is picked from list of rhyme_related/rhyme_related_thr. we add/update flag of both sentences
-
-            # find location of current sentence
-            [rhyme_related_id, rhyme_related_sub_id, thre] = song.get_rhyme_related_id_by_line_id(line_id + 1)
-            dynamo_id_curr = song.get_line_id_by_id(line_id)
-
-            # get new sentence from same class in rhyme_related/rhyme_related_thr
-            [new_sentence, [possible_rhyme_related, possible_rhyme_related_ids], id_new, used_elsewhere] = \
-                song.get_rhyme_related_by_id(rhyme_related_id, thre)
-
-            #updates flag of old sentence and new sentence
-            song.update_rhyme_related_id(sentence_id=dynamo_id_curr, ind_sub_ind=[rhyme_related_id, rhyme_related_sub_id],
-                                         action='del', thread=thre)
-            song.update_rhyme_related_id(sentence_id=new_sentence[1], ind_sub_ind=[rhyme_related_id, id_new],
-                                         line_being_used=line_id + 1, action='used', thread=thre)
-            db.session.commit()
-
-        song.update_line_id(line_id, str(new_sentence[1]))
-        song.update_line(line_id, new_sentence[0])
-        db.session.commit()
-        print('after---------------------------------------------------------')
-        print('related: ', song.related)
-        print('')
-        print('related_ids: ', song.related_ids)
-        print('')
-        print('rhyme_related: ', song.rhyme_related)
-        print('')
-        print('rhyme_related_ids: ', song.rhyme_related_ids)
-        print('')
-        print('related_thr: ', song.related_thr)
-        print('')
-        print('related_ids_thr: ', song.related_ids_thr)
-        print('')
-        print('rhyme_related_thr: ', song.rhyme_related_thr)
-        print('')
-        print('rhyme_related_ids_thr: ', song.rhyme_related_ids_thr)
-
-    # recom comes from database
-    elif recom.find('!-!') != -1:
-        sent = recom[:recom.find('!-!')]
-        id = recom[recom.find('!-!') + 2:]
-        print(id)
-        song.update_line_id(line_id, str(id))
-        song.update_line(line_id, sent)
-        db.session.commit()
-
-    # recom comes from edit field
-    else:
-        old_id = song.get_line_id_by_id(line_id)
-
-        # if edit was made by developer (marked by including (-commit-) at end of sentence)
-        # we commit changes to database (i.e. this is made to correct sentences)
-        dev_mark = recom.find('(-commit-)')
-
-        if dev_mark != -1:
-
-            # Only commit change if last word did not change
-            recom_new = recom[:dev_mark]
-
-            if len(recom_new) <= 40:
-                new_last_word = recom_new.strip().split(' ')[-1]
-
-                old_last_word = song.get_line_by_id(line_id)
-                old_last_word = old_last_word.strip().split(' ')[-1]
-
-                if new_last_word == old_last_word:
-                    change_sent(recom_new, int(old_id))
-
-                song.update_line_id(line_id, str(old_id))
-                song.update_line(line_id, recom_new)
-
-                # update sentence in related/related_thr
-                if line_id % 2 == 0:
-                    [related_id, thre] = song.get_related_id_by_line_id(line_id + 1)
-                    song.change_related(related_id, recom_new, thre=thre)
-
-                # update sentence in rhyme_related/rhyme_related_thr
-                else:
-                    [rhyme_related_id, rhyme_related_sub_id, thre] = song.get_rhyme_related_id_by_line_id(line_id + 1)
-                    song.change_rhyme_related([rhyme_related_id, rhyme_related_sub_id], recom_new, thre=thre)
-
-                db.session.commit()
-
-            else:
-                flash('New sentence is too long.')
-        else:
-
-            if len(recom) <= 40:
-                song.update_line_id(line_id, str(old_id))
-                song.update_line(line_id, recom)
-                db.session.commit()
-
-                # update sentence in related/related_thr
-                if line_id % 2 == 0:
-                    [related_id, thre] = song.get_related_id_by_line_id(line_id + 1)
-                    song.change_related(related_id, recom, thre=thre)
-
-                # update sentence in rhyme_related/rhyme_related_thr
-                else:
-                    [rhyme_related_id, rhyme_related_sub_id, thre] = song.get_rhyme_related_id_by_line_id(line_id + 1)
-                    song.change_rhyme_related([rhyme_related_id, rhyme_related_sub_id], recom, thre=thre)
-
-                db.session.commit()
-
-            else:
-                flash('New sentence is too long.')
-
-    return redirect(url_for('main.jinni_new_song_custom', song_id=song_id, liked=3))
 
 @bp.route('/jinni_use_syn/<syn>/<rhyme_with_line>/<song_id>', methods=['GET', 'POST'])
 def jinni_use_syn(syn, rhyme_with_line, song_id):
+
 
     if rhyme_with_line != '-1':
 
@@ -597,12 +254,13 @@ def jinni_use_syn(syn, rhyme_with_line, song_id):
 
         new_sent = get_sent(word=syn, rhyme=rhyme_word)
 
-        song.update_lyric(new_sent)
+        song.update_lyric(new_sent, syn)
         db.session.commit()
         lyric_clean = song.part_1.split(';')[1:]
 
-        return render_template('jinni/jinni_blank_canvas.html', new_line_form=blank_canvas_form, lyric=lyric_clean,
-                               song=song)
+        return render_template('jinni/jinni_blank_canvas.html', new_line_form=blank_canvas_form,
+                               lyric=lyric_clean, song=song, end=0, timeout=0)
+
 
 
     song = Songs(part_1='', part_1_ids='')
@@ -614,7 +272,7 @@ def jinni_use_syn(syn, rhyme_with_line, song_id):
 
     new_sent = get_sent(word=syn)
 
-    song.update_lyric(new_sent)
+    song.update_lyric(new_sent, syn)
     db.session.commit()
 
     return redirect(url_for('main.jinni_blank_canvas', song_id=song.id))
@@ -629,10 +287,17 @@ def jinni_implement_recom(recom, song_id, line_id):
     # if no recomendation was passed, generate new sentence based on line being changed (for now)
     if recom == '-none-':
 
-        related = song.get_line_by_id(line_id)
-        related = related.strip(' ').split(' ')[-1]
+        rhyme = song.get_line_by_id(line_id)
+        rhyme = rhyme.strip(' ').split(' ')[-1]
+        related = song.get_line_related(line_id)
 
-        recom_new = get_sent(rhyme=related)
+        recom_new = get_sent(word=related, rhyme=rhyme)
+
+        if recom_new == 1:
+            lyric_clean = song.part_1.split(';')[1:]
+            blank_canvas_form = JinniBlankCanvasForm()
+            return render_template('jinni/jinni_blank_canvas.html', new_line_form=blank_canvas_form,
+                                   lyric=lyric_clean, song=song, end=0, timeout=1)
 
         song.update_line_id(line_id, str(recom_new[1]))
         song.update_line(line_id, recom_new[0])
@@ -714,7 +379,7 @@ def jinni_main():
 
         first_sent = get_sent(word=req_word)
 
-        song.update_lyric(first_sent)
+        song.update_lyric(first_sent, req_word)
         song.about = req_word
         db.session.commit()
 
@@ -732,6 +397,8 @@ def jinni_blank_canvas(song_id):
     synonyms_rhyme = []
     rhyme_with_line = -1
     new_sent = -1
+    req_word_allowed = True
+    req_rhyme_allowed = True
 
     if song.get_num_lines() >= 18:
         return render_template('jinni/jinni_blank_canvas.html', new_line_form=blank_canvas_form, lyric=lyric_clean,
@@ -781,6 +448,17 @@ def jinni_blank_canvas(song_id):
                                                             ' is not currently in the database']
                 synonyms_rhyme = synonym_scrape(blank_canvas_form.rhyme_with_line.data.lower())
                 req_rhyme_allowed = False
+
+        print(req_rhyme_allowed)
+        print(req_word_allowed)
+        if not req_word_allowed or not req_rhyme_allowed:
+            print('---------------here')
+            lyric_clean = song.part_1.split(';')[1:]
+            return render_template('jinni/jinni_blank_canvas.html', new_line_form=blank_canvas_form,
+                                   lyric=lyric_clean,
+                                   song=song, synonyms=synonyms, synonyms_rhyme=synonyms_rhyme,
+                                   rhyme_with_line=rhyme_with_line, end=0, timeout=0)
+
 
         if is_int:
             # check if input is in range
@@ -833,8 +511,14 @@ def jinni_blank_canvas(song_id):
                                    song=song, synonyms=synonyms, synonyms_rhyme=synonyms_rhyme,
                                    rhyme_with_line=rhyme_with_line, end=0, timeout=1)
 
+
         if new_sent != -1:
-            song.update_lyric(new_sent)
+            if not blank_canvas_form.req_word.data or not req_word_allowed:
+                related = '-'
+            else:
+                related = blank_canvas_form.req_word.data.lower()
+
+            song.update_lyric(new_sent, related)
             db.session.commit()
 
         lyric_clean = song.part_1.split(';')[1:]
@@ -856,7 +540,7 @@ def rn_main():
         zoomed = 'rn_plots/n' + str(def_zero_prob_form.n.data) + '_thresh.png'
         return render_template('reaction_networks/rn_plot.html', full=full, zoomed=zoomed)
 
-    return render_template('reaction_networks/rn_main.html', rn_form = def_zero_prob_form)
+    return render_template('reaction_networks/rn_main.html', rn_form=def_zero_prob_form)
 
 @bp.route('/translate', methods=['POST'])
 @login_required
