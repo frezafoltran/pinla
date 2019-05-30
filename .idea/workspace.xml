@@ -3,8 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="6e1544a5-9068-4fd2-b76f-00741676af3c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/main/routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/main/routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/main/sentence_generator.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/main/sentence_generator.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/templates/jinni/jinni_blank_canvas.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/jinni/jinni_blank_canvas.html" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -18,7 +17,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/templates/jinni/jinni_main.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-54">
+            <state relative-caret-position="640">
               <caret line="32" column="61" selection-start-line="32" selection-start-column="61" selection-end-line="32" selection-end-column="61" />
               <folding>
                 <element signature="n#style#0;n#img#0;n#h1#0;n#head#0;n#!!top" expanded="true" />
@@ -30,8 +29,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-565">
-              <caret line="542" column="31" lean-forward="true" selection-start-line="542" selection-start-column="31" selection-end-line="542" selection-end-column="31" />
+            <state relative-caret-position="10640">
+              <caret line="542" column="31" selection-start-line="542" selection-start-column="31" selection-end-line="542" selection-end-column="31" />
               <folding>
                 <element signature="e#0#29#0" expanded="true" />
               </folding>
@@ -42,8 +41,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/main/routes.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="191">
-              <caret line="413" column="17" lean-forward="true" selection-start-line="413" selection-start-column="17" selection-end-line="413" selection-end-column="17" />
+            <state relative-caret-position="-969">
+              <caret line="292" column="26" selection-start-line="292" selection-start-column="18" selection-end-line="292" selection-end-column="26" />
               <folding>
                 <element signature="e#0#29#0" expanded="true" />
               </folding>
@@ -54,11 +53,12 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/templates/jinni/jinni_blank_canvas.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="406">
-              <caret line="39" column="68" selection-start-line="39" selection-start-column="68" selection-end-line="39" selection-end-column="68" />
+            <state relative-caret-position="281">
+              <caret line="252" column="43" selection-start-line="252" selection-start-column="43" selection-end-line="252" selection-end-column="43" />
               <folding>
                 <element signature="n#style#0;n#img#0;n#h1#0;n#head#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#img#0;n#h4#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#img#1;n#h4#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#div#0;n#div#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#h3#0;n#div#0;n#div#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#h4#0;n#div#0;n#div#0;n#!!top" expanded="true" />
@@ -67,6 +67,7 @@
                 <element signature="n#style#0;n#img#0;n#a#0;n#h4#0;n#div#0;n#div#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#img#0;n#h4#0;n#div#0;n#div#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#span#3;n#h4#0;n#div#0;n#div#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#img#0;n#a#1;n#h4#0;n#div#0;n#div#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#h4#0;n#div#1;n#div#0;n#form#0;n#div#0;n#div#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#h4#0;n#div#1;n#div#0;n#form#0;n#h4#2;n#div#0;n#div#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#button#0;n#form#0;n#h4#2;n#div#0;n#div#0;n#!!top" expanded="true" />
@@ -98,8 +99,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/main/sentence_generator.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="276560">
-              <caret line="13841" column="10" selection-start-line="13841" selection-start-column="10" selection-end-line="13841" selection-end-column="10" />
+            <state relative-caret-position="306">
+              <caret line="13876" column="8" selection-start-line="13876" selection-start-column="8" selection-end-line="13876" selection-end-column="8" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
               </folding>
@@ -123,9 +124,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>blank_canvas</find>
-      <find>blank_canva</find>
-      <find>curr_song</find>
       <find>lyric</find>
       <find>url</find>
       <find>static</find>
@@ -153,6 +151,9 @@
       <find>get_line_by_id</find>
       <find>get_related_by_id</find>
       <find>del_li</find>
+      <find>line_edit</find>
+      <find>line_id</find>
+      <find>implemen</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -185,9 +186,9 @@
         <option value="$PROJECT_DIR$/app/static/jinni_data/viable_words.json" />
         <option value="$PROJECT_DIR$/app/main/forms.py" />
         <option value="$PROJECT_DIR$/app/templates/jinni/jinni_main.html" />
-        <option value="$PROJECT_DIR$/app/main/sentence_generator.py" />
         <option value="$PROJECT_DIR$/app/models.py" />
         <option value="$PROJECT_DIR$/app/main/routes.py" />
+        <option value="$PROJECT_DIR$/app/main/sentence_generator.py" />
         <option value="$PROJECT_DIR$/app/templates/jinni/jinni_blank_canvas.html" />
       </list>
     </option>
@@ -203,6 +204,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -275,7 +277,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -706,6 +707,26 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/app/templates/jinni/jinni_main.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="640">
+          <caret line="32" column="61" selection-start-line="32" selection-start-column="61" selection-end-line="32" selection-end-column="61" />
+          <folding>
+            <element signature="n#style#0;n#img#0;n#h1#0;n#head#0;n#!!top" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="10640">
+          <caret line="542" column="31" selection-start-line="542" selection-start-column="31" selection-end-line="542" selection-end-column="31" />
+          <folding>
+            <element signature="e#0#29#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/app/templates/jinni/jinni_new_song_custom.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4260">
@@ -724,16 +745,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/main/sentence_generator.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="276560">
-          <caret line="13841" column="10" selection-start-line="13841" selection-start-column="10" selection-end-line="13841" selection-end-column="10" />
-          <folding>
-            <element signature="e#0#13#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/main/forms.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="800">
@@ -744,30 +755,20 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/templates/jinni/jinni_main.html">
+    <entry file="file://$PROJECT_DIR$/app/main/sentence_generator.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-54">
-          <caret line="32" column="61" selection-start-line="32" selection-start-column="61" selection-end-line="32" selection-end-column="61" />
+        <state relative-caret-position="306">
+          <caret line="13876" column="8" selection-start-line="13876" selection-start-column="8" selection-end-line="13876" selection-end-column="8" />
           <folding>
-            <element signature="n#style#0;n#img#0;n#h1#0;n#head#0;n#!!top" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/models.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-565">
-          <caret line="542" column="31" lean-forward="true" selection-start-line="542" selection-start-column="31" selection-end-line="542" selection-end-column="31" />
-          <folding>
-            <element signature="e#0#29#0" expanded="true" />
+            <element signature="e#0#13#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/main/routes.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="191">
-          <caret line="413" column="17" lean-forward="true" selection-start-line="413" selection-start-column="17" selection-end-line="413" selection-end-column="17" />
+        <state relative-caret-position="-969">
+          <caret line="292" column="26" selection-start-line="292" selection-start-column="18" selection-end-line="292" selection-end-column="26" />
           <folding>
             <element signature="e#0#29#0" expanded="true" />
           </folding>
@@ -776,11 +777,12 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/templates/jinni/jinni_blank_canvas.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="406">
-          <caret line="39" column="68" selection-start-line="39" selection-start-column="68" selection-end-line="39" selection-end-column="68" />
+        <state relative-caret-position="281">
+          <caret line="252" column="43" selection-start-line="252" selection-start-column="43" selection-end-line="252" selection-end-column="43" />
           <folding>
             <element signature="n#style#0;n#img#0;n#h1#0;n#head#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#img#0;n#h4#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#img#1;n#h4#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#div#0;n#div#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#h3#0;n#div#0;n#div#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#h4#0;n#div#0;n#div#0;n#!!top" expanded="true" />
@@ -789,6 +791,7 @@
             <element signature="n#style#0;n#img#0;n#a#0;n#h4#0;n#div#0;n#div#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#img#0;n#h4#0;n#div#0;n#div#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#span#3;n#h4#0;n#div#0;n#div#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#img#0;n#a#1;n#h4#0;n#div#0;n#div#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#h4#0;n#div#1;n#div#0;n#form#0;n#div#0;n#div#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#h4#0;n#div#1;n#div#0;n#form#0;n#h4#2;n#div#0;n#div#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#button#0;n#form#0;n#h4#2;n#div#0;n#div#0;n#!!top" expanded="true" />

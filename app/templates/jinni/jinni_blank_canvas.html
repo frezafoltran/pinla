@@ -9,7 +9,7 @@
     </head>
     <h4>You can click on  the <img src="{{ url_for('static', filename='images/refresh.png') }}" style="width:12px;height:12px;">
         symbol next to a sentence to replace it.<br>
-        Or you can click on the edit button to manually edit it.<br> 
+        Or you can click on the edit button to manually edit it.<br>
         If you wish to delete a sentence, click on <img src="{{ url_for('static', filename='images/del_sent.png') }}" style="width:20px;height:20px;">.
         </h4>
     <h4><a href="{{ url_for('main.jinni_main') }}">Start Over</a></h4>
@@ -30,14 +30,14 @@
                     <span style="display:none" >{{loop.index}} -~
                     </span>
 
-                    <a id="{{loop.index0}}_reroll" onclick="document.getElementById('{{loop.index0}}_reroll').style.display = 'none';
-                    document.getElementById('{{loop.index0}}_reroll_wait').style.display = 'inline';"
+                    <a id="reroll_{{loop.index0}}" onclick="document.getElementById('reroll_{{loop.index0}}').style.display = 'none';
+                    document.getElementById('reroll_wait_{{loop.index0}}').style.display = 'inline';"
                        href="{{url_for('main.jinni_implement_recom', recom='-none-', song_id=song.id, line_id=loop.index-1)}}">
                         <img src="{{ url_for('static', filename='images/refresh.png') }}" style="width:12px;height:12px;"> </a>
-                    <img id="{{loop.index0}}_reroll_wait" style="display:none; width:24px;height:24px;" src="{{ url_for('static', filename='images/load.gif') }}" alt="" />
+                    <img id="reroll_wait_{{loop.index0}}" style="display:none; width:24px;height:24px;" src="{{ url_for('static', filename='images/load.gif') }}" alt="" />
 
                     <span id="{{loop.index0}}" contenteditable="false" >{{line}}</span><span style="display:none">~</span>
-                    <button class="edit_button" onclick="editLine(this);">Edit</button>
+                    <button class="edit_button" onclick="editLine(this);">edit</button>
                 <a href="{{url_for('main.jinni_del_line', song_id=song.id, line_id=loop.index0)}}"><img src="{{ url_for('static', filename='images/del_sent.png') }}"
                                          style="width:20px;height:20px;"></a>
             </h4>
@@ -234,7 +234,11 @@
         function editLine(button) {
 
             line_id = $(button).parent().text();
-            line_id = line_id.substring(0,line_id.indexOf('-')) - 1;
+            line_id = line_id.replace(/(\r\n|\n|\r)/gm,"")
+            var stringArray = line_id.split(/(\s+)/);
+
+            line_id = stringArray[2] - 1
+
 
             var x = document.getElementById(line_id);
 

@@ -13871,7 +13871,11 @@ def get_sent_with_rhyme(word='', rhyme='', num_words=10):
             Key={'id': rhyme}
         )
 
-    rhyme_ids = list(rhyme_response['Item']['rhymes'].values())
+    try:
+        rhyme_ids = list(rhyme_response['Item']['rhymes'].values())
+    except KeyError:
+        return -1
+
     random.shuffle(rhyme_ids)
     related_ids = related_ids_response['Responses']['LyricLink']
 
