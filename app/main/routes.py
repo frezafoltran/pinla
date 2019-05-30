@@ -226,7 +226,7 @@ def jinni_line_edit(song_id, line_id):
 def jinni_use_syn(syn, rhyme_with_line, song_id):
 
 
-    if rhyme_with_line != '-1':
+    if rhyme_with_line != '-1' and rhyme_with_line != '-2':
 
         song = Songs.query.filter_by(id=song_id).first()
 
@@ -261,14 +261,15 @@ def jinni_use_syn(syn, rhyme_with_line, song_id):
 
         return redirect(url_for('main.jinni_blank_canvas', song_id=song.id, timeout=1))
 
+    if rhyme_with_line == '-1':
+        song = Songs(part_1='', part_1_ids='')
+        db.session.add(song)
+        song.clear_lyrics()
+        song.about = syn
+        db.session.commit()
 
-
-    song = Songs(part_1='', part_1_ids='')
-    db.session.add(song)
-    song.clear_lyrics()
-    song.about = syn
-    db.session.commit()
-    song.clear_lyrics()
+    elif rhyme_with_line == '-2':
+        song = Songs.query.filter_by(id=song_id).first()
 
     new_sent = get_sent(word=syn)
 
@@ -279,6 +280,14 @@ def jinni_use_syn(syn, rhyme_with_line, song_id):
         return redirect(url_for('main.jinni_blank_canvas', song_id=song.id, timeout=0))
 
     return redirect(url_for('main.jinni_blank_canvas', song_id=song.id, timeout=1))
+
+@bp.route('/jinni_del_line/<song_id>/<line_id>')
+def jinni_del_line(song_id, line_id):
+    song = Songs.query.filter_by(id=song_id).first()
+    song.del_line(line_id)
+    db.session.commit()
+    return redirect(url_for('main.jinni_blank_canvas', song_id=song.id, timeout=0))
+
 
 
 @bp.route('/jinni_implement_recom/<recom>/<song_id>/<line_id>', methods=['GET', 'POST'])
@@ -395,13 +404,13 @@ def jinni_blank_canvas(song_id, timeout):
 
     song = Songs.query.filter_by(id=song_id).first()
 
-    related = song.get_line_related(song.get_num_lines()-1)
+    #related = song.get_line_related(song.get_num_lines()-1)
     blank_canvas_form = JinniBlankCanvasForm()
 
     lyric_clean = song.part_1.split(';')[1:]
     synonyms = []
     synonyms_rhyme = []
-    rhyme_with_line = -1
+    rhyme_with_line = -2
     new_sent = -1
     req_word_allowed = True
     req_rhyme_allowed = True
@@ -460,7 +469,7 @@ def jinni_blank_canvas(song_id, timeout):
                 req_rhyme_allowed = False
 
         if not req_word_allowed or not req_rhyme_allowed:
-           
+
             lyric_clean = song.part_1.split(';')[1:]
             return render_template('jinni/jinni_blank_canvas.html', new_line_form=blank_canvas_form,
                                    lyric=lyric_clean,

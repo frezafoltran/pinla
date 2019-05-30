@@ -8,8 +8,10 @@
         <link rel="stylesheet" href="{{ url_for('static', filename='css/jinni_new_song.css') }}">
     </head>
     <h4>You can click on  the <img src="{{ url_for('static', filename='images/refresh.png') }}" style="width:12px;height:12px;">
-        symbol next to a sentence to replace it.
-        <br> Or you can click on the edit button to manually edit it.</h4>
+        symbol next to a sentence to replace it.<br>
+        Or you can click on the edit button to manually edit it.<br> 
+        If you wish to delete a sentence, click on <img src="{{ url_for('static', filename='images/del_sent.png') }}" style="width:20px;height:20px;">.
+        </h4>
     <h4><a href="{{ url_for('main.jinni_main') }}">Start Over</a></h4>
 
     <div class="row">
@@ -22,7 +24,8 @@
 
             <h4 style="width:100%" class=""><!--this should be song_line-->
 
-                    <span style="float:left; color:rgb(200,180,225); font-style: italic;">{{loop.index}}</span>
+                    <span style="float:left; color:rgb(200,180,225); font-style: italic;">{{loop.index}}
+                        </span>
 
                     <span style="display:none" >{{loop.index}} -~
                     </span>
@@ -35,6 +38,8 @@
 
                     <span id="{{loop.index0}}" contenteditable="false" >{{line}}</span><span style="display:none">~</span>
                     <button class="edit_button" onclick="editLine(this);">Edit</button>
+                <a href="{{url_for('main.jinni_del_line', song_id=song.id, line_id=loop.index0)}}"><img src="{{ url_for('static', filename='images/del_sent.png') }}"
+                                         style="width:20px;height:20px;"></a>
             </h4>
 
             {%endfor%}
@@ -108,6 +113,35 @@
                 <br><h3>New User? Click<a href="#"> here</a> to create an account!</h3>
                 <a href="#" onclick="ClosePopUp('dialog');">Return to Song</a>
             </div>
+
+                {%else%}
+                    <form action="" method="post">
+                    <div class="row">
+                    {{new_line_form.hidden_tag() }}
+                    <div class="col-md-5 col-md-offset-1">
+                        <h4 style="color:rgb(200,180,225);">
+                    {{new_line_form.req_word.label}}<br>
+                            {{new_line_form.req_word(size=16)}}
+                        </h4>
+                    {% for error in new_line_form.req_word.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+
+                    </div>
+                    <div class="col-md-5">
+                        <h4 style="color:rgb(200,180,225);">
+                    {{new_line_form.rhyme_with_line.label}}<br>
+                            {{new_line_form.rhyme_with_line(size=16)}}
+                        </h4>
+                    {% for error in new_line_form.rhyme_with_line.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+
+                    </div>
+                    </div>
+                    <button style="background-color:rgb(255,240,255); border:none" onclick="$('.loading').show(); $('.not-loading').hide()" type=submit class="not-loading"><img src="{{url_for('static', filename='images/add.jpg')}}" style="width:40px;height:40px;"></button>
+                    <img class="loading" style="display:none; width:100px;height:100px;" src="{{ url_for('static', filename='images/load.gif') }}" alt="" />
+                </form>
                 {%endif%}
 
             {%if end == 1%}

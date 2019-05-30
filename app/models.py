@@ -535,6 +535,38 @@ class Songs(db.Model):
         end = start + len(to_change)
         self.part_1 = self.part_1[:start] + new_line + self.part_1[end:]
 
+    def del_line(self, line_id):
+
+        line_id = int(line_id)
+
+        if line_id == 0 and self.get_num_lines() == 0:
+            self.clear_lyrics()
+
+        elif line_id == self.get_num_lines() - 1:
+            ind = self.part_1.rfind(';')
+            self.part_1 = self.part_1[:ind]
+            ind = self.part_1_ids.rfind(';')
+            self.part_1_ids = self.part_1_ids[:ind]
+            ind = self.related.rfind(';')
+            self.related = self.related[:ind]
+
+        else:
+            to_change = self.get_line_by_id(line_id)
+            start = self.part_1.find(to_change)
+            end = start + len(to_change)
+            self.part_1 = self.part_1[:start] + self.part_1[end+1:]
+
+            to_change = self.get_line_id_by_id(line_id)
+            start = self.part_1_ids.find(to_change)
+            end = start + len(to_change)
+            self.part_1_ids = self.part_1_ids[:start] + self.part_1_ids[end+1:]
+
+            to_change = self.get_related_by_id_new(line_id)
+            start = self.related.find(to_change)
+            end = start + len(to_change)
+            self.related = self.related[:start] + self.related[end + 1:]
+
+
     def update_line_id(self, line_id, new_id):
 
         to_change = self.get_line_id_by_id(line_id)
@@ -550,6 +582,15 @@ class Songs(db.Model):
             return self.part_1[all_index[line_id]+1:]
 
         return self.part_1[all_index[line_id] + 1:all_index[line_id+1]]
+
+    def get_related_by_id_new(self, line_id):
+
+        all_index = [m.start() for m in re.finditer(';', self.related)]
+
+        if len(all_index) == line_id + 1:
+            return self.related[all_index[line_id]+1:]
+
+        return self.related[all_index[line_id] + 1:all_index[line_id+1]]
 
     def get_line_related(self, line_id):
         all_index = [m.start() for m in re.finditer(';', self.related)]
