@@ -306,7 +306,7 @@ def jinni_implement_recom(recom, song_id, line_id):
         recom_new = get_sent(word=related, rhyme=rhyme)
 
         if recom_new == 1:
-            redirect(url_for('main.jinni_blank_canvas', song_id=song.id, timeout=1))
+            return redirect(url_for('main.jinni_blank_canvas', song_id=song.id, timeout=1))
 
         song.update_line_id(line_id, str(recom_new[1]))
         song.update_line(line_id, recom_new[0])
@@ -478,6 +478,7 @@ def jinni_blank_canvas(song_id, timeout):
 
 
         if is_int:
+
             # check if input is in range
             if rhyme_with_line_int > song.get_num_lines():
                 blank_canvas_form.rhyme_with_line.errors = ['This must match one of the current lines in song.']

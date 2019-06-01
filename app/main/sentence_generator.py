@@ -13788,11 +13788,21 @@ def song_id_decoder(encoded_id):
 
 def get_sent_with_rhyme(word='', rhyme='', num_words=10):
     """Returns sentence(s) that rhyme with rhyme and that are related to word"""
+
     global viable_words
 
     if not word:
         rand = random.randint(0,len(viable_words['words'])-1)
         word = viable_words['words'][rand]
+
+        if not rhyme:
+            response = rhyme_table.get_item(
+              Key={'id': word}
+            )
+            ids = response['Item']['sent_ids']
+            if ids:
+                rand = random.randint(int(ids[0]), int(ids[1]))
+                return [get_sent_by_id(rand), rand, word]
 
     syns = list_of_similar_words_updated(word)
 
@@ -13939,6 +13949,3 @@ def get_sent(word='', rhyme=''):
         new_sent = get_sent_with_rhyme(word=word, rhyme=rhyme)
 
     return new_sent
-
-
-
