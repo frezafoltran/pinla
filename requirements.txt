@@ -27,7 +27,7 @@ gunicorn==19.9.0
 idna==2.8
 inflect==2.1.0
 itsdangerous==1.1.0
-Jinja2==2.10.1
+Jinja2==2.11.3
 jmespath==0.9.4
 kibana==0.7
 kiwisolver==1.1.0
