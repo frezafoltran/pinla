@@ -31,7 +31,7 @@ Jinja2==2.10.1
 jmespath==0.9.4
 kibana==0.7
 kiwisolver==1.1.0
-Mako==1.0.9
+Mako==1.2.2
 MarkupSafe==1.1.1
 matplotlib==3.0.3
 numpy==1.16.3
